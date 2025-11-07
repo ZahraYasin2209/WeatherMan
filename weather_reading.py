@@ -1,5 +1,4 @@
-class WeatherReadings:
-    # holds daily weather data
+class WeatherReading:
     def __init__(self, date, max_temp, min_temp, mean_humidity):
         self.date = date
         self.max_temp = max_temp

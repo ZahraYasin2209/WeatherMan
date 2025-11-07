@@ -5,64 +5,96 @@ RESET = "\033[0m"
 
 
 def print_yearly_report(result):
-    if not result:
+    if not result or (not result.get('highest') and not result.get('lowest')
+                      and not result.get('humid')):
         print("No data present for this year")
         return
 
-    print(f"Highest: {result['highest'].max_temp}C on {result['highest'].
-          date.strftime('%B %d')}")             # Highest temp in year
-    print(f"Lowest: {result['lowest'].min_temp}C on {result['lowest'].
-          date.strftime('%B %d')}")             # Lowest temp in year
-    print(f"Humidity: {result['humid'].mean_humidity}% on {result['humid'].
-          date.strftime('%B %d')}")             # Humid day of year
+    if result['highest']:
+        print(f"Highest: {result['highest'].max_temp}C on {result['highest'].
+          date.strftime('%B %d')}")
+    else:
+        print("No highest temperature data available for this year.")
+
+    if result['lowest']:
+        print(f"Lowest: {result['lowest'].min_temp}C on {result['lowest'].
+          date.strftime('%B %d')}")
+    else:
+        print("No lowest temperature data available for this year.")
+
+    if result['humid']:
+        print(f"Humidity: {result['humid'].mean_humidity}% on {result['humid'].
+          date.strftime('%B %d')}")
+    else:
+        print("No humidity data available for this year.")
 
 
-def print_monthly_report(result):
+def print_monthly_report(result, year=None, month=None):
     if not result:
-        print("No data for this month")
+        if year and month:
+            print(f"No data available for {year}/{month:02d}")
+        else:
+            print("No data available for this month")
         return
 
-    print(f"Highest Average: {result['avg_high']}C")          # Average of Highest Temp
-    print(f"Lowest Average: {result['avg_low']}C")            # Average of Lowest Temp
-    print(f"Average Mean Humidity: {result['avg_humid']}%")   # Average of Mean Humidity
+    print(f"Highest Average: {result.get('highest_average_temp', 'N/A')}C")
+    print(f"Lowest Average: {result.get('lowest_average_temp', 'N/A')}C")
+    print(f"Average Mean Humidity: {result.get('average_mean_humidity', 'N/A')}%")
+
+
+""" Filter and sort readings for given year and month """
+def filter_sort_readings(readings, year, month):
+    return sorted(
+        [reading for reading in readings if reading.date.year == year and reading.date.month == month],
+        key=lambda reading: reading.date
+    )
+
+
+def temperature_bars(reading, horizontal=False):
+    if reading.max_temp is None or reading.min_temp is None:
+        return None
+    day = f"{reading.date.day:02d}"
+
+    if horizontal:
+        return (
+            f"{day} {BLUE}{'+' * reading.min_temp}+{RED}{'+' * reading.max_temp} {
+            PURPLE}{reading.min_temp}C - {reading.max_temp}C {RESET}"
+        )
+    else:
+        return (
+            f"{day} {RED}{'+' * reading.max_temp} {PURPLE}{reading.max_temp}C {RESET}", \
+            f"{day} {BLUE}{'+' * reading.min_temp} {PURPLE}{reading.min_temp}C {RESET}"
+        )
 
 
 def monthly_chart(readings, year, month):
-    # Bar Charts for month (red -> high temp, blue -> low temp)
-    month_data = sorted([i for i in readings if i.date.year == year and
-                         i.date.month == month], key=lambda i: i.date)
+    month_data = filter_sort_readings(readings, year, month)
 
     if not month_data:
-        print("No data for this month")
+        print("No data present for this month")
         return
 
-    month_name = month_data[0].date.strftime("%B %Y")
+    month_name = month_data[0].date.strftime("%B %Y") if month_data else "Month not exists"
     print(f"{month_name}")
 
-    for i in month_data:
-        if i.max_temp is None or i.min_temp is None:
-            continue
-        day = f"{i.date.day:02d}"
-        print(f"{day} {RED}{"+" * i.max_temp}{RESET} {PURPLE}{i.max_temp}C {RESET}")
-        print(f"{day} {BLUE}{"+" * i.min_temp} {PURPLE}{i.min_temp}C {RESET}")
+    for reading in month_data:
+        formatted_bars = temperature_bars(reading, horizontal=False)
+        if formatted_bars:
+            print(formatted_bars[0])
+            print(formatted_bars[1])
 
 
 def horizontal_monthly_chart(readings, year, month):
-    # Horizontal Bar Chart for month (red -> high temp, blue -> low temp)
-    month_data = sorted([i for i in readings if i.date.year == year and
-                         i.date.month == month], key=lambda i: i.date)
+    month_data = filter_sort_readings(readings, year, month)
 
     if not month_data:
-        print("No data for this month")
+        print("No data present for this month")
         return
 
-    month_name = month_data[0].date.strftime("%B %Y")
+    month_name = month_data[0].date.strftime("%B %Y") if month_data else "Month not exists"
     print(f"{month_name}")
 
-    for i in month_data:
-        if i.max_temp is None or i.min_temp is None:
-            continue
-        day = f"{i.date.day:02d}"
-
-        print(f"{day} {BLUE}{"+" * i.min_temp}+{RED}{"+" * i.max_temp}"
-              f"{PURPLE} {i.min_temp}C - {i.max_temp}C {RESET}")
+    for reading in month_data:
+        formatted_bars = temperature_bars(reading, horizontal=True)
+        if formatted_bars:
+            print(formatted_bars)
