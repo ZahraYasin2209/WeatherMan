@@ -1,6 +1,6 @@
 from constants import (
-    WEATHER_ATTRIBUTES,
     MONTHLY_ATTRIBUTE_MAP,
+    WEATHER_ATTRIBUTES,
     YEARLY_ATTRIBUTE_MAP
 )
 
