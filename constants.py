@@ -9,15 +9,3 @@ RED = "\033[91m"
 BLUE = "\033[94m"
 PURPLE = "\033[95m"
 RESET = "\033[0m"
-
-MONTHLY_ATTRIBUTE_MAP = {
-    "max_temp": "highest_average_temp",
-    "min_temp": "lowest_average_temp",
-    "mean_humidity": "average_mean_humidity"
-}
-
-YEARLY_ATTRIBUTE_MAP = {
-    "max_temp": "highest_temperature",
-    "min_temp": "lowest_temperature",
-    "mean_humidity": "highest_mean_humidity_day"
-}
