@@ -18,12 +18,13 @@ class WeatherReport:
         """Filter readings to include only those where specified attributes are not None.
 
         Args:
-            readings (list[WeatherReading]): List of readings.
-            year (int): Year.
-            month (int): Month.
+             readings (list[WeatherReading]): List of weather reading objects.
+             year (int): The year to filter by.
+             month (int): The month to filter by (1–12).
 
         Returns:
-            dict[str, list[WeatherReading]]: Dictionary mapping attribute -> filtered readings.
+            list[WeatherReading]: A list of WeatherReading objects that match
+            the given year and month, sorted by date.
         """
         return sorted(
             [reading for reading in readings if reading.date.year == year
@@ -100,6 +101,5 @@ class WeatherReport:
             bars = self.temperature_bars(reading, horizontal)
             if not bars:
                 continue
-
             for line in (bars if isinstance(bars, list) else [bars]):
                 print(line)
