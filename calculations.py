@@ -1,59 +1,60 @@
+from constants import WEATHER_ATTRIBUTES
+
+
 class WeatherCalculator:
     @staticmethod
     def calculate_average(values):
-        valid_values = [valid for valid in values if valid is not None]
-        return round(sum(valid_values) / len(valid_values)) if valid_values else None
+        numeric_values = [value for value in values if value is not None]
+        return round(sum(numeric_values) / len(numeric_values)) \
+            if numeric_values else None
 
     @staticmethod
-    def filter_valid_readings(readings, reading_attributes):
+    def filter_valid_readings(readings, attributes):
         return {attribute: [reading for reading in readings if getattr(reading, attribute) is not None]
-                for attribute in reading_attributes}
+                for attribute in attributes}
 
     @staticmethod
-    def find_extreme_values(readings_dict):
-        """Find readings with the maximum value for each attribute.
-        Args:
-            readings_dict (dict[str, list[WeatherReading]]): Dictionary of
-            attribute → list of readings.
-
-        Returns:
-            dict[str, WeatherReading | None]: Attribute → reading with the
-            highest value or None if empty.
-        """
+    def find_max_readings(readings_dict):
         return {
-            attribute: max(data, key=lambda reading: getattr(reading, attribute), default=None)
-            for attribute, data in readings_dict.items()
+            attribute: max(readings, key=lambda reading: getattr(reading, attribute), default=None)
+            for attribute, readings in readings_dict.items()
         }
 
+    @staticmethod
+    def filter_by_year_month(readings, year, month=None):
+        return [reading for reading in readings if reading.date.year == year and
+                (month is None or reading.date.month == month)]
+
     def yearly_calculations(self, readings, year):
-        yearly_readings = [reading for reading in readings if reading.date.year == year]
-        result = None
+        yearly_readings = self.filter_by_year_month(readings, year)
+        if not yearly_readings:
+            return None
 
-        if yearly_readings:
-            valid = self.filter_valid_readings(yearly_readings,
-                                           ["max_temp", "min_temp", "mean_humidity"])
-            extreme_values = self.find_extreme_values(valid)
+        valid_readings = self.filter_valid_readings(yearly_readings, WEATHER_ATTRIBUTES)
+        max_values = self.find_max_readings(valid_readings)
 
-            if any(extreme_values[attr] is not None for attr in ["max_temp", "min_temp", "mean_humidity"]):
-                result = {
-                    "highest_temperature": extreme_values["max_temp"],
-                    "lowest_temperature": extreme_values["min_temp"],
-                    "most_humid_day": extreme_values["mean_humidity"],
-                }
+        if not any(max_values[attribute] for attribute in WEATHER_ATTRIBUTES):
+            return None
 
-        return result
+        yearly_temp = {
+            "max_temp": "highest_temperature",
+            "min_temp": "lowest_temperature",
+            "mean_humidity": "highest_mean_humidity_day"
+        }
+
+        return {key: max_values[attribute] for attribute, key in yearly_temp.items()}
 
     def monthly_calculations(self, readings, year, month):
-        monthly_readings = [reading for reading in readings if reading.date.year == year
-                            and reading.date.month == month]
+        monthly_readings = self.filter_by_year_month(readings, year, month)
 
-        result = None
+        if not monthly_readings:
+            return None
 
-        if monthly_readings:
-            result = {
-                "highest_average_temp": self.calculate_average(reading.max_temp for reading in monthly_readings),
-                "lowest_average_temp": self.calculate_average(reading.min_temp for reading in monthly_readings),
-                "average_mean_humidity": self.calculate_average(reading.mean_humidity for reading in monthly_readings),
-            }
+        monthly_temp = {
+            "max_temp": "highest_average_temp",
+            "min_temp": "lowest_average_temp",
+            "mean_humidity": "average_mean_humidity"
+        }
 
-        return result
+        return {key: self.calculate_average(getattr(reading, attribute) for reading in monthly_readings)
+                for attribute, key in monthly_temp.items()}

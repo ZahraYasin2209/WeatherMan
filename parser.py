@@ -1,8 +1,12 @@
 import csv
 import os
-
-from constants import *
 from datetime import datetime
+
+from constants import (
+    MAX_TEMPERATURE,
+    MIN_TEMPERATURE,
+    MEAN_HUMIDITY
+)
 from weather_reading import WeatherReading
 
 

@@ -18,47 +18,57 @@ class WeatherMan:
         parser.add_argument(
             "-e", "--yearly",
             type=int,
-            help="Generate yearly report. Please provide YEAR.")
+            nargs='+',
+            help="Generate yearly reports. Provide YEAR(s)."
+        )
 
         parser.add_argument(
             "-a", "--monthly",
             type=str,
-            help="Generate monthly averages. Please provide YEAR/MONTH.")
+            nargs='+',
+            help="Generate monthly averages. Provide YEAR(s)/MONTH(s) (e.g: 2006/3)."
+        )
 
         parser.add_argument(
             "-c", "--chart",
             type=str,
-            help="Generate vertical monthly chart. Please provide YEAR/MONTH.")
+            nargs='+',
+            help="Generate vertical monthly charts. Provide YEAR(s)/MONTH(s)."
+        )
 
         parser.add_argument(
             "-b", "--hchart",
             type=str,
-            help="Generate horizontal monthly chart. Please provide YEAR/MONTH.")
+            nargs='+',
+            help="Generate horizontal monthly charts. Provide YEAR/MONTH."
+        )
 
         args = parser.parse_args()
 
         readings = self.parser.parse_directory(DIRECTORY_PATH)
 
         if args.yearly:
-            result = self.calculator.yearly_calculations(readings, args.yearly)
-            self.report.print_yearly_report(result)
+            for year in args.yearly:
+                result = self.calculator.yearly_calculations(readings, year)
+                self.report.print_yearly_report(result)
 
         if args.monthly:
-            try:
-                year, month = map(int, args.monthly.split("/"))
-                result = self.calculator.monthly_calculations(readings, year, month)
-                self.report.print_monthly_report(result, year, month)
-            except ValueError:
-                print("Month requires proper format YEAR/MONTH (e.g: 2006/3)")
+            for option in args.monthly:
+                try:
+                    year, month = map(int, option.split("/"))
+                    result = self.calculator.monthly_calculations(readings, year, month)
+                    self.report.print_monthly_report(result, year, month)
+                except ValueError:
+                    print(f"Invalid format for monthly report: {option}. Use YEAR/MONTH")
 
-        if args.chart or args.hchart:
-            option = args.chart or args.hchart
-            try:
-                year, month = map(int, option.split("/"))
-                horizontal = bool(args.hchart)
-                self.report.display_chart(readings, year, month, horizontal=horizontal)
-            except ValueError:
-                print("Chart requires proper format YEAR/MONTH (e.g: 2006/3)")
+        for chart_args, horizontal in [(args.chart, False), (args.hchart, True)]:
+            if chart_args:
+                for option in chart_args:
+                    try:
+                        year, month = map(int, option.split("/"))
+                        self.report.display_chart(readings, year, month, horizontal=horizontal)
+                    except ValueError:
+                        print(f"Invalid format for chart: {option}. Use YEAR/MONTH")
 
 
 if __name__ == "__main__":
