@@ -1,68 +1,105 @@
-RED = "\033[91m"
-BLUE = "\033[94m"
-PURPLE = "\033[95m"
-RESET = "\033[0m"
+from constants import (
+    BLUE,
+    PURPLE,
+    RED,
+    RESET,
+)
 
 
-def print_yearly_report(result):
-    if not result:
-        print("No data present for this year")
-        return
+class WeatherReport:
+    @staticmethod
+    def display_no_data(year=None, month=None):
+        print(f"No data available for {year}/{month:02d}"
+              if year and month
+              else "No data available.")
 
-    print(f"Highest: {result['highest'].max_temp}C on {result['highest'].
-          date.strftime('%B %d')}")             # Highest temp in year
-    print(f"Lowest: {result['lowest'].min_temp}C on {result['lowest'].
-          date.strftime('%B %d')}")             # Lowest temp in year
-    print(f"Humidity: {result['humid'].mean_humidity}% on {result['humid'].
-          date.strftime('%B %d')}")             # Humid day of year
+    @staticmethod
+    def filter_sort_readings(readings, year, month):
+        """Filter readings to include only those where specified attributes are not None.
 
+        Args:
+             readings (list[WeatherReading]): List of weather reading objects.
+             year (int): The year to filter by.
+             month (int): The month to filter by (1–12).
 
-def print_monthly_report(result):
-    if not result:
-        print("No data for this month")
-        return
+        Returns:
+            list[WeatherReading]: A list of WeatherReading objects that match
+            the given year and month, sorted by date.
+        """
+        return sorted(
+            [reading for reading in readings if reading.date.year == year
+             and reading.date.month == month], key=lambda reading: reading.date
+        )
 
-    print(f"Highest Average: {result['avg_high']}C")          # Average of Highest Temp
-    print(f"Lowest Average: {result['avg_low']}C")            # Average of Lowest Temp
-    print(f"Average Mean Humidity: {result['avg_humid']}%")   # Average of Mean Humidity
+    @staticmethod
+    def temperature_bars(reading, horizontal=False):
+        """Generate temperature bar(s) for a single reading.
 
+        Args:
+            reading (WeatherReading): The weather reading.
+            horizontal (bool): If True, return a horizontal bar format.
 
-def monthly_chart(readings, year, month):
-    # Bar Charts for month (red -> high temp, blue -> low temp)
-    month_data = sorted([i for i in readings if i.date.year == year and
-                         i.date.month == month], key=lambda i: i.date)
+        Returns:
+            str | list[str] | None: Formatted bar(s) or None if data missing.
+        """
+        if reading.max_temp is None or reading.min_temp is None:
+            return None
 
-    if not month_data:
-        print("No data for this month")
-        return
+        day= f"{reading.date.day:02d}"
 
-    month_name = month_data[0].date.strftime("%B %Y")
-    print(f"{month_name}")
+        min_temp_bar = f"{BLUE}{'+' * reading.min_temp}"
+        max_temp_bar = f"{RED}{'+' * reading.max_temp}"
+        temp_values = f"{PURPLE} {reading.min_temp}C - {reading.max_temp}C {RESET}"
 
-    for i in month_data:
-        if i.max_temp is None or i.min_temp is None:
-            continue
-        day = f"{i.date.day:02d}"
-        print(f"{day} {RED}{"+" * i.max_temp}{RESET} {PURPLE}{i.max_temp}C {RESET}")
-        print(f"{day} {BLUE}{"+" * i.min_temp} {PURPLE}{i.min_temp}C {RESET}")
+        return (
+            f"{day} {min_temp_bar}+{max_temp_bar}{temp_values}" if horizontal else
+            [
+                f"{day} {max_temp_bar} {PURPLE}{reading.max_temp}C {RESET}",
+                f"{day} {min_temp_bar} {PURPLE}{reading.min_temp}C {RESET}"
+            ]
+        )
 
+    @staticmethod
+    def print_yearly_report(result):
+        if not result:
+            print("No data present for this year.")
+            return
 
-def horizontal_monthly_chart(readings, year, month):
-    # Horizontal Bar Chart for month (red -> high temp, blue -> low temp)
-    month_data = sorted([i for i in readings if i.date.year == year and
-                         i.date.month == month], key=lambda i: i.date)
+        labels = {
+            "highest_temperature": ("Highest", "max_temp", "C"),
+            "lowest_temperature": ("Lowest", "min_temp", "C"),
+            "highest_mean_humidity_day": ("Humidity", "mean_humidity", "%"),
+        }
 
-    if not month_data:
-        print("No data for this month")
-        return
+        for key, (label, attribute, unit) in labels.items():
+            reading = result.get(key)
+            msg = (
+                f"{label}: {getattr(reading, attribute)}{unit} on {reading.date.strftime('%B %d')}"
+                if reading else f"No {label.lower()} data available for this year."
+            )
+            print(msg)
 
-    month_name = month_data[0].date.strftime("%B %Y")
-    print(f"{month_name}")
+    def print_monthly_report(self, result, year=None, month=None):
+        if not result:
+            return self.display_no_data(year, month)
 
-    for i in month_data:
-        if i.max_temp is None or i.min_temp is None:
-            continue
-        day = f"{i.date.day:02d}"
+        print(
+            f"Highest Average: {result['highest_average_temp']}C\n"
+            f"Lowest Average: {result['lowest_average_temp']}C\n"
+            f"Average Mean Humidity: {result['average_mean_humidity']}%"
+        )
 
-        print(f"{day} {BLUE}{"+" * i.min_temp}+{RED}{"+" * i.max_temp}"
-              f"{PURPLE} {i.min_temp}C - {i.max_temp}C {RESET}")
+    def display_chart(self, readings, year, month, horizontal=False):
+        monthly_readings = self.filter_sort_readings(readings, year, month)
+
+        if not monthly_readings:
+            return self.display_no_data(year, month)
+
+        print(monthly_readings[0].date.strftime("%B %Y"))
+
+        for reading in monthly_readings:
+            bars = self.temperature_bars(reading, horizontal)
+            if not bars:
+                continue
+            for line in (bars if isinstance(bars, list) else [bars]):
+                print(line)
