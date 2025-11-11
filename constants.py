@@ -1,0 +1,11 @@
+DIRECTORY_PATH = "/Users/macbook/PycharmProjects/PythonProject/Weather Project/weatherfiles"
+
+MAX_TEMPERATURE = "Max TemperatureC"
+MIN_TEMPERATURE = "Min TemperatureC"
+MEAN_HUMIDITY = " Mean Humidity"
+WEATHER_ATTRIBUTES = ["max_temp", "min_temp", "mean_humidity"]
+
+RED = "\033[91m"
+BLUE = "\033[94m"
+PURPLE = "\033[95m"
+RESET = "\033[0m"
