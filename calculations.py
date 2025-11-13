@@ -7,11 +7,12 @@ from constants import (
 
 class WeatherCalculator:
     @staticmethod
-    def calculate_average(values):
-        numeric_values = [value for value in values if value is not None]
+    def calculate_average(weather_readings):
+        valid_weather_readings = [reading for reading in weather_readings
+                                if reading is not None]
 
-        return round(sum(numeric_values) / len(numeric_values)) \
-            if numeric_values else None
+        return round(sum(valid_weather_readings) / len(valid_weather_readings)) \
+            if valid_weather_readings else None
 
     @staticmethod
     def filter_valid_readings(weather_readings, weather_attributes):

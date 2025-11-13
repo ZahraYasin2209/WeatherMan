@@ -4,6 +4,9 @@ MAX_TEMPERATURE = "Max TemperatureC"
 MIN_TEMPERATURE = "Min TemperatureC"
 MEAN_HUMIDITY = " Mean Humidity"
 WEATHER_ATTRIBUTES = ["max_temp", "min_temp", "mean_humidity"]
+LOG_FILE = "log_errors.log"
+DATE_COLUMN = "PKT"
+ALTERNATE_DATE_COLUMN = "PKST"
 
 RED = "\033[91m"
 BLUE = "\033[94m"
@@ -20,4 +23,11 @@ YEARLY_ATTRIBUTE_MAP = {
     "max_temp": "highest_temperature",
     "min_temp": "lowest_temperature",
     "mean_humidity": "highest_mean_humidity_day"
+}
+
+LOG_CONFIG = {
+    "filename": LOG_FILE,
+    "level": "WARNING",
+    "format": "%(asctime)s - %(levelname)s - %(message)s",
+    "datefmt": "%Y-%m-%d %H:%M:%S"
 }

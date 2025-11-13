@@ -45,7 +45,7 @@ class WeatherReport:
         if reading.max_temp is None or reading.min_temp is None:
             return None
 
-        day= f"{reading.date.day:02d}"
+        day = f"{reading.date.day:02d}"
 
         min_temp_bar = f"{BLUE}{'+' * reading.min_temp}"
         max_temp_bar = f"{RED}{'+' * reading.max_temp}"

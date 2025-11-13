@@ -1,7 +1,7 @@
 import argparse
 
-from constants import DIRECTORY_PATH
 from calculations import WeatherCalculator
+from constants import DIRECTORY_PATH
 from parser import WeatherDataParser
 from reports import WeatherReport
 
@@ -62,13 +62,12 @@ class WeatherMan:
                     print(f"Invalid format for monthly report: {option}. Use YEAR/MONTH")
 
         for chart_args, horizontal in [(args.chart, False), (args.hchart, True)]:
-            if chart_args:
-                for option in chart_args:
-                    try:
-                        year, month = map(int, option.split("/"))
-                        self.report.display_chart(readings, year, month, horizontal=horizontal)
-                    except ValueError:
-                        print(f"Invalid format for chart: {option}. Use YEAR/MONTH")
+            for option in chart_args or []:
+                try:
+                    year, month = map(int, option.split("/"))
+                    self.report.display_chart(readings, year, month, horizontal=horizontal)
+                except ValueError:
+                    print(f"Invalid format for chart: {option}. Use YEAR/MONTH")
 
 
 if __name__ == "__main__":
