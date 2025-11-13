@@ -4,8 +4,8 @@ from datetime import datetime
 
 from constants import (
     MAX_TEMPERATURE,
+    MEAN_HUMIDITY,
     MIN_TEMPERATURE,
-    MEAN_HUMIDITY
 )
 from weather_reading import WeatherReading
 
