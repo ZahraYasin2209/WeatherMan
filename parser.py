@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime
-import os
 import logging
+import os
 
 from constants import (
     ALTERNATE_DATE_COLUMN,
