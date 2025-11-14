@@ -54,8 +54,8 @@ class WeatherReportConsoleView:
         print(monthly_readings[0].date.strftime("%B %Y"))
 
         for reading in monthly_readings:
-            bars = self.readings_formatter.temperature_bars(reading, horizontal)
-            if not bars:
+            temp_bars = self.readings_formatter.temperature_bars(reading, horizontal)
+            if not temp_bars:
                 continue
-            for line in (bars if isinstance(bars, list) else [bars]):
+            for line in (temp_bars if isinstance(temp_bars, list) else [temp_bars]):
                 print(line)
