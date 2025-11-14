@@ -3,14 +3,14 @@ import argparse
 from calculations import WeatherCalculator
 from constants import DIRECTORY_PATH
 from parser import WeatherDataParser
-from reports import WeatherReport
+from weather_report_console_view import WeatherReportConsoleView
 
 
 class WeatherMan:
     def __init__(self):
         self.parser = WeatherDataParser()
         self.calculator = WeatherCalculator()
-        self.report = WeatherReport()
+        self.report = WeatherReportConsoleView()
 
     def run(self):
         parser = argparse.ArgumentParser(description="WeatherMan Project")
@@ -50,14 +50,14 @@ class WeatherMan:
         if args.yearly:
             for year in args.yearly:
                 yearly_report = self.calculator.yearly_calculations(readings, year)
-                self.report.print_yearly_report(yearly_report)
+                self.report.display_yearly_report(yearly_report)
 
         if args.monthly:
             for option in args.monthly:
                 try:
                     year, month = map(int, option.split("/"))
                     monthly_report = self.calculator.monthly_calculations(readings, year, month)
-                    self.report.print_monthly_report(monthly_report, year, month)
+                    self.report.display_monthly_report(monthly_report, year, month)
                 except ValueError:
                     print(f"Invalid format for monthly report: {option}. Use YEAR/MONTH")
 

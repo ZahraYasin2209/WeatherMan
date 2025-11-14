@@ -1,4 +1,4 @@
-from weather_reading_utils import (
+from weather_reading_helpers import (
     WeatherReadingFilter,
     WeatherReadingFormatter
 )
@@ -16,7 +16,7 @@ class WeatherReportConsoleView:
               else "No data available.")
 
     @staticmethod
-    def print_yearly_report(result):
+    def display_yearly_report(result):
         if not result:
             print("No data present for this year.")
             return
@@ -35,7 +35,7 @@ class WeatherReportConsoleView:
             )
             print(msg)
 
-    def print_monthly_report(self, result, year=None, month=None):
+    def display_monthly_report(self, result, year=None, month=None):
         if not result:
             return self.display_no_data(year, month)
 

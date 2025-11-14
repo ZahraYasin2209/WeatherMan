@@ -3,7 +3,7 @@ from constants import (
     WEATHER_ATTRIBUTES,
     YEARLY_ATTRIBUTE_MAP,
 )
-from weather_reading_utils import WeatherReadingFilter
+from weather_reading_helpers import WeatherReadingFilter
 
 
 class WeatherCalculator:
@@ -15,11 +15,12 @@ class WeatherCalculator:
         valid_weather_readings = [reading for reading in weather_readings
                                 if reading is not None]
 
-        return round(sum(valid_weather_readings) / len(valid_weather_readings)) \
-            if valid_weather_readings else None
+        return (
+            round(sum(valid_weather_readings) / len(valid_weather_readings), 2)
+                if valid_weather_readings else None )
 
     @staticmethod
-    def find_max_readings(readings_dict):
+    def find_max_values_per_attribute(readings_dict):
         return {
             weather_attribute: max(weather_readings, key=lambda reading:
                 getattr(reading, weather_attribute), default=None)
@@ -32,7 +33,7 @@ class WeatherCalculator:
             return None
 
         valid_readings = self.readings.filter_valid_readings(yearly_readings, WEATHER_ATTRIBUTES)
-        max_values = self.find_max_readings(valid_readings)
+        max_values = self.find_max_values_per_attribute(valid_readings)
 
         if not any(max_values[attribute] for attribute in WEATHER_ATTRIBUTES):
             return None
