@@ -33,14 +33,14 @@ class WeatherDataParser:
 
     @classmethod
     def parse_directory(cls, directory):
-        readings = []
+        parsed_weather_readings = []
         dir_path = Path(directory)
 
         for file_path in dir_path.iterdir():
             with file_path.open('r', encoding='utf-8') as weather_file:
-                reader = csv.DictReader(weather_file)
+                weather_readings = csv.DictReader(weather_file)
 
-                for row_num, row in enumerate(reader, start=2):
+                for row_num, row in enumerate(weather_readings, start=2):
                     date_col = DATE_COLUMN if DATE_COLUMN in row else ALTERNATE_DATE_COLUMN
                     date_value = row.get(date_col, "").strip()
 
@@ -75,7 +75,7 @@ class WeatherDataParser:
                         )
                         continue
 
-                    readings.append(
+                    parsed_weather_readings.append(
                         WeatherReading(
                             date,
                             numeric_values['MAX_TEMPERATURE'],
@@ -84,4 +84,4 @@ class WeatherDataParser:
                         )
                     )
 
-        return readings
+        return parsed_weather_readings
