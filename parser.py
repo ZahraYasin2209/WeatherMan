@@ -1,15 +1,13 @@
 import csv
 import logging
-import os
 from datetime import datetime
+from pathlib import Path
 
 from constants import (
     ALTERNATE_DATE_COLUMN,
     DATE_COLUMN,
-    MAX_TEMPERATURE,
-    MEAN_HUMIDITY,
-    MIN_TEMPERATURE,
     LOG_CONFIG,
+    NUMERIC_FIELDS,
 )
 from weather_reading import WeatherReading
 
@@ -36,75 +34,53 @@ class WeatherDataParser:
     @classmethod
     def parse_directory(cls, directory):
         readings = []
+        dir_path = Path(directory)
 
-        for filename in os.listdir(directory):
-            path = os.path.join(directory, filename)
-
-            if os.path.isdir(path) or not filename.endswith(".txt"):
-                continue
-
-            with (open(path, 'r', encoding='utf-8') as weather_file):
+        for file_path in dir_path.iterdir():
+            with file_path.open('r', encoding='utf-8') as weather_file:
                 reader = csv.DictReader(weather_file)
 
-                if not reader.fieldnames:
-                    cls.log_warning(filename, 0,
-                                    "FileError",
-                                    "No header found")
-                    continue
-
                 for row_num, row in enumerate(reader, start=2):
-                    if all(not (valid_values and valid_values.strip())
-                           for valid_values in row.values()):
-                        continue
+                    date_col = DATE_COLUMN if DATE_COLUMN in row else ALTERNATE_DATE_COLUMN
+                    date_value = row.get(date_col, "").strip()
 
-                    date_col = (
-                        DATE_COLUMN if DATE_COLUMN in row
-                        else ALTERNATE_DATE_COLUMN if ALTERNATE_DATE_COLUMN in row
-                        else None
-                    )
-
-                    required_columns = [MAX_TEMPERATURE, MIN_TEMPERATURE, MEAN_HUMIDITY]
-
-                    if date_col:
-                        required_columns.append(date_col)
-
-                    missing_columns = [col for col in required_columns
-                                       if col not in row or not row[col].strip()]
-
-                    if missing_columns:
-                        cls.log_warning(filename, row_num,
-                                        "MissingColumns", ", ".join(missing_columns))
+                    if not date_value:
+                        cls.log_warning(file_path.name, row_num, "MissingColumns",
+                                        "Date column missing")
                         continue
 
                     try:
-                        date = datetime.strptime(row[date_col], "%Y-%m-%d").date()
+                        date = datetime.strptime(date_value, "%Y-%m-%d").date()
                     except (ValueError, TypeError):
-                        cls.log_warning(filename, row_num,
+                        cls.log_warning(file_path.name, row_num,
                                         "InvalidDate",
-                                        f"'{row.get(date_col)}'")
+                                        f"'{date_value}'")
                         continue
 
-                    numeric_values = {
-                        MAX_TEMPERATURE: cls.parse_value_to_int(row[MAX_TEMPERATURE]),
-                        MIN_TEMPERATURE: cls.parse_value_to_int(row[MIN_TEMPERATURE]),
-                        MEAN_HUMIDITY: cls.parse_value_to_int(row[MEAN_HUMIDITY])
-                    }
+                    numeric_values = {}
+                    invalid_columns = []
 
-                    invalid_columns = [col for col, numeric_value in numeric_values.items()
-                                       if numeric_value is None]
+                    for key, field_name in NUMERIC_FIELDS.items():
+                        value = cls.parse_value_to_int(row.get(field_name))
+                        numeric_values[key] = value
+                        if value is None:
+                            invalid_columns.append(field_name)
 
                     if invalid_columns:
-                        cls.log_warning(filename, row_num,
-                                        "ValueError", "Invalid values in: "
-                                            + ", ".join(invalid_columns))
+                        cls.log_warning(
+                            file_path.name,
+                            row_num,
+                            "ValueError",
+                            "Invalid values in: " + ", ".join(invalid_columns)
+                        )
                         continue
 
                     readings.append(
                         WeatherReading(
                             date,
-                            numeric_values[MAX_TEMPERATURE],
-                            numeric_values[MIN_TEMPERATURE],
-                            numeric_values[MEAN_HUMIDITY]
+                            numeric_values['MAX_TEMPERATURE'],
+                            numeric_values['MIN_TEMPERATURE'],
+                            numeric_values['MEAN_HUMIDITY']
                         )
                     )
 

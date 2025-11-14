@@ -31,3 +31,9 @@ LOG_CONFIG = {
     "format": "%(asctime)s - %(levelname)s - %(message)s",
     "datefmt": "%Y-%m-%d %H:%M:%S"
 }
+
+NUMERIC_FIELDS = {
+    'MAX_TEMPERATURE': 'Max TemperatureC',
+    'MIN_TEMPERATURE': 'Min TemperatureC',
+    'MEAN_HUMIDITY': ' Mean Humidity'
+}
