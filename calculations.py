@@ -37,7 +37,7 @@ class WeatherCalculator:
         if not any(max_values[attribute] for attribute in WEATHER_ATTRIBUTES):
             return None
 
-        return {key: max_values[attribute] for attribute, key in YEARLY_ATTRIBUTE_MAP.items()}
+        return {output_key: max_values[input_attr] for input_attr, output_key in YEARLY_ATTRIBUTE_MAP.items()}
 
     def monthly_calculations(self, weather_readings, year, month):
         monthly_readings = self.readings.filter_readings_by_year_and_month(weather_readings, year, month)
@@ -45,5 +45,5 @@ class WeatherCalculator:
         if not monthly_readings:
             return None
 
-        return {key: self.calculate_average(getattr(reading, attribute) for reading in monthly_readings)
-                for attribute, key in MONTHLY_ATTRIBUTE_MAP.items()}
+        return {output_key: self.calculate_average(getattr(reading, attribute) for reading in monthly_readings)
+                for attribute, output_key in MONTHLY_ATTRIBUTE_MAP.items()}
