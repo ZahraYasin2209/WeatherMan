@@ -8,7 +8,7 @@ from constants import (
 
 class WeatherReadingFilter:
     @staticmethod
-    def filter_and_sort_readings(readings, year, month):
+    def get_sorted_readings_by_year_and_month(readings, year, month):
         """
         Filter readings to include only those where specified attributes are not None.
 
@@ -22,12 +22,13 @@ class WeatherReadingFilter:
             the given year and month, sorted by date.
         """
         return sorted(
-            [reading for reading in readings if reading.date.year == year and reading.date.month == month],
+            [reading for reading in readings
+             if reading.date.year == year and reading.date.month == month],
             key=lambda reading: reading.date
         )
 
     @staticmethod
-    def filter_valid_readings(weather_readings, weather_attributes):
+    def get_valid_readings_by_attribute(weather_readings, weather_attributes):
         """
         Filter readings to include only those where specified attributes are not None.
 
@@ -45,7 +46,7 @@ class WeatherReadingFilter:
                 for weather_attribute in weather_attributes}
 
     @staticmethod
-    def filter_readings_by_year_and_month(weather_readings, year, month=None):
+    def get_readings_by_year_and_month(weather_readings, year, month=None):
         """
         Filter readings by year and optionally by month.
 
@@ -63,7 +64,7 @@ class WeatherReadingFilter:
 
 class WeatherReadingFormatter:
     @staticmethod
-    def temperature_bars(reading, horizontal=False):
+    def format_temperature_bars(reading, horizontal=False):
         """
         Generate temperature bar(s) for a single reading.
 
@@ -74,19 +75,21 @@ class WeatherReadingFormatter:
         Returns:
             str | list[str] | None: Formatted bar(s) or None if data missing.
         """
-        if reading.max_temp is None or reading.min_temp is None:
-            return None
+        temp_bars_formatter = None
 
-        day = f"{reading.date.day:02d}"
+        if reading.max_temp is not None and reading.min_temp is not None:
+            day = f"{reading.date.day:02d}"
 
-        min_temp_bar = f"{BLUE}{"+" * reading.min_temp}"
-        max_temp_bar = f"{RED}{"+" * reading.max_temp}"
-        temp_values = f"{PURPLE} {reading.min_temp}C - {reading.max_temp}C {RESET}"
+            min_temp_bar = f"{BLUE}{"+" * reading.min_temp}"
+            max_temp_bar = f"{RED}{"+" * reading.max_temp}"
+            temp_values = f"{PURPLE} {reading.min_temp}C - {reading.max_temp}C {RESET}"
 
-        return (
-            f"{day} {min_temp_bar}+{max_temp_bar}{temp_values}" if horizontal else
-            [
-                f"{day} {max_temp_bar} {PURPLE}{reading.max_temp}C {RESET}",
-                f"{day} {min_temp_bar} {PURPLE}{reading.min_temp}C {RESET}"
-            ]
-        )
+            temp_bars_formatter = (
+                f"{day} {min_temp_bar}+{max_temp_bar}{temp_values}" if horizontal else
+                [
+                    f"{day} {max_temp_bar} {PURPLE}{reading.max_temp}C {RESET}",
+                    f"{day} {min_temp_bar} {PURPLE}{reading.min_temp}C {RESET}"
+                ]
+            )
+
+        return temp_bars_formatter

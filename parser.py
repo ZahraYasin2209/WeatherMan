@@ -32,9 +32,11 @@ class WeatherDataParser:
             int | None: Converted integer, or None if conversion fails.
         """
         try:
-            return int(value)
+            value_parser = int(value)
         except (ValueError, TypeError):
-            return None
+            value_parser = None
+
+        return value_parser
 
     @staticmethod
     def log_parsing_warning(filename, row_num, error_type, message):
@@ -80,17 +82,19 @@ class WeatherDataParser:
             list[WeatherReading]: A list of WeatherReading objects parsed from the file.
         """
         weather_readings = []
+
         with file_path.open("r", encoding="utf-8") as weather_file:
             weather_file_rows = csv.DictReader(weather_file)
 
-            start_line_num = 2 if weather_file_rows.fieldnames else 1
+            for row in weather_file_rows:
+                weather_reading = cls.parse_row_to_reading(
+                    row, file_path.name, weather_file_rows.line_num
+                )
 
-            for row_num, row in enumerate(weather_file_rows, start=start_line_num):
-                weather_reading = cls.parse_row_to_reading(row, file_path.name, row_num)
                 if weather_reading:
                     weather_readings.append(weather_reading)
 
-            return weather_readings
+        return weather_readings
 
     @classmethod
     def parse_row_to_reading(cls, row, filename, row_num):
@@ -106,43 +110,45 @@ class WeatherDataParser:
             WeatherReading | None: A WeatherReading object if the row is valid,
             otherwise None if there are missing or invalid values.
         """
+
+        weather_reading = None
+
         date_column_in_row = DATE_COLUMN if DATE_COLUMN in row else ALTERNATE_DATE_COLUMN
         date_value_from_csv = row.get(date_column_in_row, "").strip()
 
         if not date_value_from_csv :
             cls.log_parsing_warning(filename, row_num, "MissingColumns",
                                         "Date column missing")
-            return None
+        else:
+            try:
+                date = datetime.strptime(date_value_from_csv, "%Y-%m-%d").date()
+                numeric_values = {}
+                columns_with_invalid_values = []
 
-        try:
-            date = datetime.strptime(date_value_from_csv, "%Y-%m-%d").date()
-        except (ValueError, TypeError):
-            cls.log_parsing_warning(filename, row_num,
-                                    "InvalidDate",
-                                    f"'{date_value_from_csv}'")
-            return None
+                for field_key, field_name in NUMERIC_FIELDS.items():
+                    numeric_value = cls.parse_value_to_int(row.get(field_name))
+                    numeric_values[field_key] = numeric_value
 
-        numeric_values = {}
-        columns_with_invalid_values = []
+                    if numeric_value is None:
+                        columns_with_invalid_values.append(field_name)
 
-        for field_key, field_name in NUMERIC_FIELDS.items():
-            numeric_value = cls.parse_value_to_int(row.get(field_name))
-            numeric_values[field_key] = numeric_value
-            if numeric_value is None:
-                columns_with_invalid_values.append(field_name)
+                if columns_with_invalid_values:
+                    cls.log_parsing_warning(
+                        filename,
+                        row_num,
+                        "ValueError",
+                        "Invalid values in: " + ", ".join(columns_with_invalid_values)
+                    )
+                else:
+                    weather_reading = WeatherReading(
+                        date,
+                        numeric_values["MAX_TEMPERATURE"],
+                        numeric_values["MIN_TEMPERATURE"],
+                        numeric_values["MEAN_HUMIDITY"]
+                    )
+            except (ValueError, TypeError):
+                cls.log_parsing_warning(filename, row_num,
+                                        "InvalidDate",
+                                        f"'{date_value_from_csv}'")
 
-        if columns_with_invalid_values:
-            cls.log_parsing_warning(
-                filename,
-                row_num,
-                "ValueError",
-                "Invalid values in: " + ", ".join(columns_with_invalid_values)
-            )
-            return None
-
-        return WeatherReading(
-            date,
-            numeric_values["MAX_TEMPERATURE"],
-            numeric_values["MIN_TEMPERATURE"],
-            numeric_values["MEAN_HUMIDITY"]
-        )
+        return weather_reading

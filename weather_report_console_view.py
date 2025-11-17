@@ -28,7 +28,8 @@ class WeatherReportConsoleView:
     @staticmethod
     def display_yearly_report(result):
         """
-        Display the yearly weather report including highest temperature, lowest temperature, and highest mean humidity.
+        Display the yearly weather report including highest temperature, lowest temperature,
+        and highest mean humidity.
 
         Args:
             result (dict): Dictionary containing WeatherReading objects keyed by:
@@ -62,7 +63,8 @@ class WeatherReportConsoleView:
 
     def display_monthly_report(self, result, year=None, month=None):
         """
-        Display the monthly weather report including highest average temperature, lowest average temperature, and average mean humidity.
+        Display the monthly weather report including highest average temperature,
+        lowest average temperature, and average mean humidity.
 
         Args:
             result (dict | None): Dictionary containing monthly statistics with keys:
@@ -101,7 +103,8 @@ class WeatherReportConsoleView:
         Returns:
             None
         """
-        monthly_weather_readings = self.readings_filter.filter_and_sort_readings(readings, year, month)
+        monthly_weather_readings = (self.readings_filter.
+                                    get_sorted_readings_by_year_and_month(readings, year, month))
 
         if not monthly_weather_readings:
             return self.display_no_data(year, month)
@@ -109,7 +112,7 @@ class WeatherReportConsoleView:
         print(monthly_weather_readings[0].date.strftime("%B %Y"))
 
         for weather_reading in monthly_weather_readings:
-            temp_bars = self.readings_formatter.temperature_bars(weather_reading, horizontal)
+            temp_bars = self.readings_formatter.format_temperature_bars(weather_reading, horizontal)
             if not temp_bars:
                 continue
             for temp_chart_line in (temp_bars if isinstance(temp_bars, list) else [temp_bars]):

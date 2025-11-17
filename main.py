@@ -85,7 +85,9 @@ class WeatherMan:
             for option in args.monthly:
                 try:
                     year, month = map(int, option.split("/"))
-                    monthly_report = self.calculator.calculate_monthly_weather_statistics(weather_readings, year, month)
+                    monthly_report = self.calculator.calculate_monthly_weather_statistics(
+                        weather_readings, year, month
+                    )
                     self.report.display_monthly_report(monthly_report, year, month)
                 except ValueError:
                     print(f"Invalid format for monthly report: {option}. Please use YEAR/MONTH Format")
