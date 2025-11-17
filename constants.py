@@ -1,10 +1,10 @@
-DIRECTORY_PATH = "/Users/macbook/PycharmProjects/PythonProject/Weather Project/weatherfiles"
+WEATHER_DIRECTORY_PATH = "/Users/macbook/PycharmProjects/PythonProject/Weather Project/weatherfiles"
 
 MAX_TEMPERATURE = "Max TemperatureC"
 MIN_TEMPERATURE = "Min TemperatureC"
 MEAN_HUMIDITY = " Mean Humidity"
 WEATHER_ATTRIBUTES = ["max_temp", "min_temp", "mean_humidity"]
-LOG_FILE = "log_errors.log"
+LOG_FILE = "weatherman_log_errors.log"
 DATE_COLUMN = "PKT"
 ALTERNATE_DATE_COLUMN = "PKST"
 
@@ -33,7 +33,7 @@ LOG_CONFIG = {
 }
 
 NUMERIC_FIELDS = {
-    'MAX_TEMPERATURE': 'Max TemperatureC',
-    'MIN_TEMPERATURE': 'Min TemperatureC',
-    'MEAN_HUMIDITY': ' Mean Humidity'
+    "MAX_TEMPERATURE": "Max TemperatureC",
+    "MIN_TEMPERATURE": "Min TemperatureC",
+    "MEAN_HUMIDITY": " Mean Humidity"
 }

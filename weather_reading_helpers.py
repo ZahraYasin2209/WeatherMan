@@ -9,7 +9,8 @@ from constants import (
 class WeatherReadingFilter:
     @staticmethod
     def filter_and_sort_readings(readings, year, month):
-        """Filter readings to include only those where specified attributes are not None.
+        """
+        Filter readings to include only those where specified attributes are not None.
 
         Args:
              readings (list[WeatherReading]): List of weather reading objects.
@@ -21,18 +22,41 @@ class WeatherReadingFilter:
             the given year and month, sorted by date.
         """
         return sorted(
-            [reading for reading in readings if reading.date.year == year
-             and reading.date.month == month], key=lambda reading: reading.date
+            [reading for reading in readings if reading.date.year == year and reading.date.month == month],
+            key=lambda reading: reading.date
         )
 
     @staticmethod
     def filter_valid_readings(weather_readings, weather_attributes):
+        """
+        Filter readings to include only those where specified attributes are not None.
+
+        Args:
+            weather_readings (list[WeatherReading]): List of weather reading objects.
+            weather_attributes (list[str]): List of attribute names to filter on
+                (e.g., ['max_temp', 'min_temp', 'mean_humidity']).
+
+        Returns:
+            dict[str, list[WeatherReading]]: Dictionary mapping each attribute name to a list of readings
+            where that attribute is not None.
+        """
         return {weather_attribute: [reading for reading in weather_readings
                                     if getattr(reading, weather_attribute) is not None]
                 for weather_attribute in weather_attributes}
 
     @staticmethod
     def filter_readings_by_year_and_month(weather_readings, year, month=None):
+        """
+        Filter readings by year and optionally by month.
+
+        Args:
+            weather_readings (list[WeatherReading]): List of weather reading objects.
+            year (int): Year to filter by.
+            month (int | None, optional): Month to filter by (1–12). If None, returns all readings for the year.
+
+        Returns:
+            list[WeatherReading]: List of readings matching the specified year and, if provided, month.
+        """
         return [reading for reading in weather_readings if reading.date.year == year and
                 (month is None or reading.date.month == month)]
 
@@ -40,7 +64,8 @@ class WeatherReadingFilter:
 class WeatherReadingFormatter:
     @staticmethod
     def temperature_bars(reading, horizontal=False):
-        """Generate temperature bar(s) for a single reading.
+        """
+        Generate temperature bar(s) for a single reading.
 
         Args:
             reading (WeatherReading): The weather reading.
@@ -54,8 +79,8 @@ class WeatherReadingFormatter:
 
         day = f"{reading.date.day:02d}"
 
-        min_temp_bar = f"{BLUE}{'+' * reading.min_temp}"
-        max_temp_bar = f"{RED}{'+' * reading.max_temp}"
+        min_temp_bar = f"{BLUE}{"+" * reading.min_temp}"
+        max_temp_bar = f"{RED}{"+" * reading.max_temp}"
         temp_values = f"{PURPLE} {reading.min_temp}C - {reading.max_temp}C {RESET}"
 
         return (
