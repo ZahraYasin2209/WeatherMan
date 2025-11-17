@@ -86,9 +86,9 @@ class WeatherDataParser:
         with file_path.open("r", encoding="utf-8") as weather_file:
             weather_file_rows = csv.DictReader(weather_file)
 
-            for weather_file_row in weather_file_rows:
+            for row_num in weather_file_rows:
                 weather_reading = cls.parse_row_to_reading(
-                    weather_file_row, file_path.name, weather_file_rows.line_num
+                    row_num, file_path.name, weather_file_rows.line_num
                 )
 
                 if weather_reading:
