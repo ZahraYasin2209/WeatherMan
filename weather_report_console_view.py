@@ -88,7 +88,7 @@ class WeatherReportConsoleView:
         )
         print(monthly_weather_report)
 
-    def display_chart(self, readings, year, month, horizontal=False):
+    def display_temp_chart(self, readings, year, month, horizontal=False):
         """
         Display a chart of temperatures for a given month.
         Uses temperature bars (vertical or horizontal) for visualization.

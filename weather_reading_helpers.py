@@ -35,7 +35,7 @@ class WeatherReadingFilter:
         Args:
             weather_readings (list[WeatherReading]): List of weather reading objects.
             weather_attributes (list[str]): List of attribute names to filter on
-                (e.g., ["max_temp", "min_temp", "mean_humidity"]).
+                (e.g., ['max_temp', 'min_temp', 'mean_humidity']).
 
         Returns:
             dict[str, list[WeatherReading]]: Dictionary mapping each attribute name to a list of readings

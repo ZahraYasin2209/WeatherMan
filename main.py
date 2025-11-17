@@ -8,6 +8,7 @@ from weather_report_console_view import WeatherReportConsoleView
 
 DEFAULT_WEATHER_DIR_PATH = os.getenv("WEATHER_DIR", WEATHER_DIRECTORY_PATH)
 
+
 class WeatherMan:
     def __init__(self):
         self.parser = WeatherDataParser()
@@ -96,7 +97,7 @@ class WeatherMan:
             for option in chart_args or []:
                 try:
                     year, month = map(int, option.split("/"))
-                    self.report.display_chart(weather_readings, year, month, horizontal=horizontal)
+                    self.report.display_temp_chart(weather_readings, year, month, horizontal=horizontal)
                 except ValueError:
                     print(f"Invalid format for chart: {option}. Please use YEAR/MONTH Format")
 

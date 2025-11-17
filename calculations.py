@@ -39,7 +39,7 @@ class WeatherCalculator:
 
         Args:
             attribute_readings (dict[str, list[WeatherReading]]):
-            Dictionary mapping weather attributes (e.g., "temperature", "humidity") to lists of WeatherReading objects.
+            Dictionary mapping weather attributes (e.g., 'temperature', 'humidity') to lists of WeatherReading objects.
 
         Returns:
             dict[str, WeatherReading | None]: Dictionary mapping each attribute to the WeatherReading
