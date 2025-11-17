@@ -55,7 +55,7 @@ class WeatherReportConsoleView:
             weather_reading = result.get(key)
 
             yearly_weather_report = (
-                f"{label}: {getattr(weather_reading, attribute)}{unit} on {weather_reading.date.strftime('%B %d')}"
+                f"{label}: {getattr(weather_reading, attribute)}{unit} on {weather_reading.date.strftime("%B %d")}"
                     if weather_reading
                     else f"No {label.lower()} data available for this year."
             )
