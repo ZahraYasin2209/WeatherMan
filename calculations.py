@@ -1,5 +1,6 @@
 from constants import (
     MONTHLY_ATTRIBUTE_MAP,
+    ROUNDED_AVERAGE_PRECISION,
     WEATHER_ATTRIBUTES,
     YEARLY_ATTRIBUTE_MAP,
 )
@@ -22,12 +23,14 @@ class WeatherCalculator:
             float | None: Rounded average or None if no valid readings
         """
         valid_weather_readings = [
-            reading for reading in weather_readings
-            if reading]
+            reading for reading in weather_readings if reading
+        ]
 
         average_weather_readings = (
-            round(sum(valid_weather_readings) / len(valid_weather_readings), 2)
-            if valid_weather_readings else None
+            round(
+                sum(valid_weather_readings) / len(valid_weather_readings),
+                ROUNDED_AVERAGE_PRECISION
+            )
         )
 
         return average_weather_readings
@@ -39,7 +42,7 @@ class WeatherCalculator:
 
         Args:
             attribute_readings (dict[str, list[WeatherReading]]):
-            Dictionary mapping weather attributes (e.g., 'temperature', 'humidity') to lists of WeatherReading objects.
+            Dictionary mapping weather attributes (e.g., "temperature", "humidity") to lists of WeatherReading objects.
 
         Returns:
             dict[str, WeatherReading | None]: Dictionary mapping each attribute to the WeatherReading
@@ -48,16 +51,13 @@ class WeatherCalculator:
         """
         max_reading_per_attribute = {}
 
-        for attribute, weather_readings in attribute_readings.items():
-            max_reading = None
+        for weather_attribute, weather_readings in attribute_readings.items():
+            max_reading = max(
+                weather_readings,
+                key=lambda reading: getattr(reading, weather_attribute)
+            )
 
-            if weather_readings:
-                max_reading = max(
-                    weather_readings,
-                    key=lambda reading: getattr(reading, attribute)
-                )
-
-            max_reading_per_attribute[attribute] = max_reading
+            max_reading_per_attribute[weather_attribute] = max_reading
 
         return max_reading_per_attribute
 
@@ -72,21 +72,27 @@ class WeatherCalculator:
         Returns:
             dict | None: Dictionary of yearly statistics or None if no valid readings.
         """
-        yearly_calculations_result = None
+        yearly_calculations_result = {}
 
-        yearly_readings = self.readings.get_readings_by_year_and_month(weather_readings, year)
+        yearly_weather_readings = self.readings.get_readings_by_year_and_month(
+            weather_readings, year
+        )
 
-        if yearly_readings:
+        if not yearly_weather_readings:
+            yearly_calculations_result = None
+        else:
             valid_weather_readings = self.readings.get_valid_readings_by_attribute(
-                yearly_readings, WEATHER_ATTRIBUTES
+                yearly_weather_readings, WEATHER_ATTRIBUTES
             )
 
             max_values_per_attribute = self.find_max_values_per_attribute(valid_weather_readings)
 
-            if any(max_values_per_attribute.get(attribute) for attribute in WEATHER_ATTRIBUTES):
+            if any(
+                    max_values_per_attribute.get(weather_attribute) for weather_attribute in WEATHER_ATTRIBUTES
+            ):
                 yearly_calculations_result = {
-                    output_key: max_values_per_attribute.get(input_attr)
-                    for input_attr, output_key in YEARLY_ATTRIBUTE_MAP.items()
+                    yearly_stats_identifier: max_values_per_attribute.get(input_weather_attr)
+                    for input_weather_attr, yearly_stats_identifier in YEARLY_ATTRIBUTE_MAP.items()
                 }
 
         return yearly_calculations_result
@@ -103,24 +109,25 @@ class WeatherCalculator:
         Returns:
             dict | None: Dictionary of monthly statistics or None if no valid readings.
         """
-        monthly_calculations_result = None
+        monthly_calculations_result = {}
 
         monthly_weather_readings = self.readings.get_readings_by_year_and_month(
             weather_readings, year, month
         )
 
-        if monthly_weather_readings:
-            monthly_calculations_result = {}
-
-            for weather_attribute, output_key in MONTHLY_ATTRIBUTE_MAP.items():
-                attribute_values = []
+        if not monthly_weather_readings:
+            monthly_calculations_result = None
+        else:
+            for weather_attribute, monthly_stats_key in MONTHLY_ATTRIBUTE_MAP.items():
+                weather_attribute_values = []
 
                 for reading in monthly_weather_readings:
-                    value = getattr(reading, weather_attribute, None)
-                    if value is not None:
-                        attribute_values.append(value)
+                    weather_attribute_value = getattr(reading, weather_attribute, None)
 
-                average_value = self.calculate_average(attribute_values)
-                monthly_calculations_result[output_key] = average_value
+                    if weather_attribute_value is not None:
+                        weather_attribute_values.append(weather_attribute_value)
+
+                average_value = self.calculate_average(weather_attribute_values)
+                monthly_calculations_result[monthly_stats_key] = average_value
 
         return monthly_calculations_result

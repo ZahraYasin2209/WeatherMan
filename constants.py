@@ -1,12 +1,12 @@
-WEATHER_DIRECTORY_PATH = "/Users/macbook/PycharmProjects/PythonProject/Weather Project/weatherfiles"
+WEATHER_DIRECTORY_PATH = "../../weatherfiles"
 
-MAX_TEMPERATURE = "Max TemperatureC"
-MIN_TEMPERATURE = "Min TemperatureC"
-MEAN_HUMIDITY = " Mean Humidity"
-WEATHER_ATTRIBUTES = ["max_temp", "min_temp", "mean_humidity"]
+DATE_COLUMNS = ["PKT", "PKST"]
 LOG_FILE = "weatherman_log_errors.log"
-DATE_COLUMN = "PKT"
-ALTERNATE_DATE_COLUMN = "PKST"
+MAX_TEMPERATURE = "Max TemperatureC"
+MEAN_HUMIDITY = " Mean Humidity"
+MIN_TEMPERATURE = "Min TemperatureC"
+ROUNDED_AVERAGE_PRECISION = 2
+WEATHER_ATTRIBUTES = ["max_temp", "min_temp", "mean_humidity"]
 
 RED = "\033[91m"
 BLUE = "\033[94m"
@@ -17,12 +17,6 @@ MONTHLY_ATTRIBUTE_MAP = {
     "max_temp": "highest_average_temp",
     "min_temp": "lowest_average_temp",
     "mean_humidity": "average_mean_humidity"
-}
-
-YEARLY_ATTRIBUTE_MAP = {
-    "max_temp": "highest_temperature",
-    "min_temp": "lowest_temperature",
-    "mean_humidity": "highest_mean_humidity_day"
 }
 
 LOG_CONFIG = {
@@ -36,4 +30,10 @@ NUMERIC_FIELDS = {
     "MAX_TEMPERATURE": "Max TemperatureC",
     "MIN_TEMPERATURE": "Min TemperatureC",
     "MEAN_HUMIDITY": " Mean Humidity"
+}
+
+YEARLY_ATTRIBUTE_MAP = {
+    "max_temp": "highest_temperature",
+    "min_temp": "lowest_temperature",
+    "mean_humidity": "highest_mean_humidity_day"
 }

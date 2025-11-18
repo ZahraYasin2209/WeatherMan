@@ -79,8 +79,13 @@ class WeatherMan:
 
         if args.yearly:
             for year in args.yearly:
-                yearly_report = self.calculator.calculate_yearly_weather_statistics(weather_readings, year)
-                self.report.display_yearly_report(yearly_report)
+                yearly_report = self.calculator.calculate_yearly_weather_statistics(
+                    weather_readings, year
+                )
+                if yearly_report:
+                    self.report.display_yearly_report(yearly_report)
+                else:
+                    print(f"No data available for the year {year}.")
 
         if args.monthly:
             for option in args.monthly:

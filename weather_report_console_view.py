@@ -21,18 +21,18 @@ class WeatherReportConsoleView:
         Returns:
             None
         """
-        print(f"No data available for {year}/{month:02d}"
-              if year and month
-              else "No data available.")
+        if year and month:
+            print(f"No data available for {year}/{month:02d}")
+        else:
+            print("No data available.")
 
-    @staticmethod
-    def display_yearly_report(result):
+    def display_yearly_report(self, yearly_statistics):
         """
         Display the yearly weather report including highest temperature, lowest temperature,
         and highest mean humidity.
 
         Args:
-            result (dict): Dictionary containing WeatherReading objects keyed by:
+            yearly_statistics (dict): Dictionary containing WeatherReading objects keyed by:
                 "highest_temperature",
                 "lowest_temperature",
                 "highest_mean_humidity_day"
@@ -41,33 +41,34 @@ class WeatherReportConsoleView:
         Returns:
             None
         """
-        if not result:
-            print("No data present for this year.")
-            return
-
-        labels = {
+        weather_attribute_labels = {
             "highest_temperature": ("Highest", "max_temp", "C"),
             "lowest_temperature": ("Lowest", "min_temp", "C"),
             "highest_mean_humidity_day": ("Humidity", "mean_humidity", "%"),
         }
 
-        for key, (label, attribute, unit) in labels.items():
-            weather_reading = result.get(key)
+        for weather_attribute_key, (
+                weather_attribute_label, weather_attribute, weather_unit
+        ) in weather_attribute_labels.items():
+            weather_reading = yearly_statistics.get(weather_attribute_key)
+
+            if not weather_reading:
+                continue
 
             yearly_weather_report = (
-                f"{label}: {getattr(weather_reading, attribute)}{unit} on {weather_reading.date.strftime("%B %d")}"
-                    if weather_reading
-                    else f"No {label.lower()} data available for this year."
+                f"{weather_attribute_label}: {getattr(weather_reading,weather_attribute)}{weather_unit} "
+                f"on {weather_reading.date.strftime("%B %d")}"
             )
+
             print(yearly_weather_report)
 
-    def display_monthly_report(self, result, year=None, month=None):
+    def display_monthly_report(self, monthly_statistics, year=None, month=None):
         """
         Display the monthly weather report including highest average temperature,
         lowest average temperature, and average mean humidity.
 
         Args:
-            result (dict | None): Dictionary containing monthly statistics with keys:
+            monthly_statistics (dict | None): Dictionary containing monthly statistics with keys:
                 "highest_average_temp" (int or float)
                 "lowest_average_temp" (int or float)
                 "average_mean_humidity" (int or float)
@@ -78,13 +79,13 @@ class WeatherReportConsoleView:
         Returns:
             None
         """
-        if not result:
+        if not monthly_statistics:
             return self.display_no_data(year, month)
 
         monthly_weather_report = (
-            f"Highest Average: {result["highest_average_temp"]}C\n"
-            f"Lowest Average: {result["lowest_average_temp"]}C\n"
-            f"Average Mean Humidity: {result["average_mean_humidity"]}%"
+            f"Highest Average: {monthly_statistics["highest_average_temp"]}C\n"
+            f"Lowest Average: {monthly_statistics["lowest_average_temp"]}C\n"
+            f"Average Mean Humidity: {monthly_statistics["average_mean_humidity"]}%"
         )
         print(monthly_weather_report)
 
@@ -103,8 +104,9 @@ class WeatherReportConsoleView:
         Returns:
             None
         """
-        monthly_weather_readings = (self.readings_filter.
-                                    get_sorted_readings_by_year_and_month(readings, year, month))
+        monthly_weather_readings = self.readings_filter.get_sorted_readings_by_year_and_month(
+            readings, year, month
+        )
 
         if not monthly_weather_readings:
             return self.display_no_data(year, month)
@@ -112,7 +114,10 @@ class WeatherReportConsoleView:
         print(monthly_weather_readings[0].date.strftime("%B %Y"))
 
         for weather_reading in monthly_weather_readings:
-            temp_bars = self.readings_formatter.format_temperature_bars(weather_reading, horizontal)
+            temp_bars = self.readings_formatter.format_temperature_bars(
+                weather_reading, horizontal
+            )
+
             if not temp_bars:
                 continue
             for temp_chart_line in (temp_bars if isinstance(temp_bars, list) else [temp_bars]):

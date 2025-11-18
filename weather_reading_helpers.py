@@ -22,9 +22,12 @@ class WeatherReadingFilter:
             the given year and month, sorted by date.
         """
         return sorted(
-            [reading for reading in readings if reading.date.year == year
-             and reading.date.month == month],
-             key=lambda reading: reading.date
+            [
+                reading
+                for reading in readings
+                if reading.date.year == year and reading.date.month == month
+            ],
+            key=lambda reading: reading.date
         )
 
     @staticmethod
@@ -41,9 +44,21 @@ class WeatherReadingFilter:
             dict[str, list[WeatherReading]]: Dictionary mapping each attribute name to a list of readings
             where that attribute is not None.
         """
-        return {weather_attribute: [reading for reading in weather_readings
-                                    if getattr(reading, weather_attribute) is not None]
-                for weather_attribute in weather_attributes}
+
+        filtered_valid_readings_by_attribute = {}
+
+        for weather_attribute in weather_attributes:
+            valid_weather_readings = []
+
+            for reading in weather_readings:
+                attribute_value = getattr(reading, weather_attribute)
+
+                if attribute_value is not None:
+                    valid_weather_readings.append(reading)
+
+            filtered_valid_readings_by_attribute[weather_attribute] = valid_weather_readings
+
+        return filtered_valid_readings_by_attribute
 
     @staticmethod
     def get_readings_by_year_and_month(weather_readings, year, month=None):
@@ -58,8 +73,11 @@ class WeatherReadingFilter:
         Returns:
             list[WeatherReading]: List of readings matching the specified year and, if provided, month.
         """
-        return [reading for reading in weather_readings if reading.date.year == year and
-                (month is None or reading.date.month == month)]
+        return [
+            reading
+            for reading in weather_readings
+            if reading.date.year == year and (month is None or reading.date.month == month)
+        ]
 
 
 class WeatherReadingFormatter:
@@ -77,11 +95,11 @@ class WeatherReadingFormatter:
         """
         temp_bars_formatter = None
 
-        if reading.max_temp is not None and reading.min_temp is not None:
+        if reading.max_temp and reading.min_temp:
             day = f"{reading.date.day:02d}"
 
-            min_temp_bar = f"{BLUE}{"+" * reading.min_temp}"
-            max_temp_bar = f"{RED}{"+" * reading.max_temp}"
+            min_temp_bar = f"{BLUE}{'+' * max(0, reading.min_temp)}"
+            max_temp_bar = f"{RED}{'+' * max(0, reading.max_temp)}"
             temp_values = f"{PURPLE} {reading.min_temp}C - {reading.max_temp}C {RESET}"
 
             temp_bars_formatter = (
