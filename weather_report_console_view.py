@@ -48,7 +48,7 @@ class WeatherReportConsoleView:
         }
 
         for weather_attribute_key, (
-                weather_attribute_label, weather_attribute, weather_unit
+                weather_attribute_label, weather_attribute, weather_unit_of_measurement
         ) in weather_attribute_labels.items():
             weather_reading = yearly_statistics.get(weather_attribute_key)
 
@@ -56,7 +56,7 @@ class WeatherReportConsoleView:
                 continue
 
             yearly_weather_report = (
-                f"{weather_attribute_label}: {getattr(weather_reading,weather_attribute)}{weather_unit} "
+                f"{weather_attribute_label}: {getattr(weather_reading,weather_attribute)}{weather_unit_of_measurement} "
                 f"on {weather_reading.date.strftime("%B %d")}"
             )
 
