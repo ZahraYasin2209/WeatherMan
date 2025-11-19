@@ -27,7 +27,6 @@ class WeatherReportConsoleView:
             else "No data available."
         )
 
-
     def display_yearly_report(self, yearly_statistics):
         """
         Display the yearly weather report including highest temperature, lowest temperature,
