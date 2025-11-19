@@ -34,7 +34,7 @@ class WeatherCalculator:
                 )
             )
 
-        return average_weather_readings
+            return average_weather_readings
 
     @staticmethod
     def find_max_reading_per_attribute(attribute_readings):
