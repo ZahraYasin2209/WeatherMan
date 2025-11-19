@@ -44,21 +44,14 @@ class WeatherReadingFilter:
             dict[str, list[WeatherReading]]: Dictionary mapping each attribute name to a list of readings
             where that attribute is not None.
         """
-
-        filtered_valid_readings_by_attribute = {}
-
-        for weather_attribute in weather_attributes:
-            valid_weather_readings = []
-
-            for reading in weather_readings:
-                attribute_value = getattr(reading, weather_attribute)
-
-                if attribute_value:
-                    valid_weather_readings.append(reading)
-
-            filtered_valid_readings_by_attribute[weather_attribute] = valid_weather_readings
-
-        return filtered_valid_readings_by_attribute
+        return {
+            weather_attribute: [
+                reading
+                for reading in weather_readings
+                if getattr(reading, weather_attribute)
+            ]
+            for weather_attribute in weather_attributes
+        }
 
     @staticmethod
     def get_readings_by_year_and_month(weather_readings, year, month=None):

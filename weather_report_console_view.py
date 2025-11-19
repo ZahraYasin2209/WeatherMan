@@ -120,3 +120,25 @@ class WeatherReportConsoleView:
                 continue
             for temp_chart_line in (temp_bars if isinstance(temp_bars, list) else [temp_bars]):
                 print(temp_chart_line)
+
+    def display_weather_report(self, weather_data_category, weather_report_data, year=None, month=None, horizontal=False):
+        """
+        A helper function to display the data (yearly, monthly, or charts).
+        It checks if the data exists and displays it or shows 'no data' message.
+
+        Args:
+            weather_data_category (str): Type of data - "yearly", "monthly", or "chart".
+            weather_report_data (dict | list): The data to display.
+            year (int, optional): Year for the report or chart. Defaults to None.
+            month (int, optional): Month for the report or chart. Defaults to None.
+            horizontal (bool, optional): If True, display horizontal chart. Defaults to False.
+        """
+        if weather_report_data:
+            if weather_data_category == "yearly":
+                self.display_yearly_report(weather_report_data)
+            elif weather_data_category == "monthly":
+                self.display_monthly_report(weather_report_data, year, month)
+            elif weather_data_category == "chart":
+                self.display_temp_chart(weather_report_data, horizontal)
+        else:
+            self.display_no_data(year, month)

@@ -110,9 +110,13 @@ class WeatherDataParser:
             WeatherReading | None: A WeatherReading object if the row is valid,
             otherwise None if there are missing or invalid values.
         """
-        weather_reading = None
+        valid_date_column_values = (
+            row.get(date_column, "").strip()
+            for date_column in DATE_COLUMNS
+            if row.get(date_column, "").strip()
+        )
 
-        date_str_from_csv = cls.get_first_valid_date_value(DATE_COLUMNS, row)
+        date_str_from_csv = next(valid_date_column_values, None)
 
         try:
             date = datetime.strptime(date_str_from_csv, "%Y-%m-%d").date()
@@ -123,23 +127,15 @@ class WeatherDataParser:
                 numeric_value = cls.parse_value_to_int(row.get(weather_field_label))
                 numeric_values[weather_field_identifier] = numeric_value
 
-                if numeric_value is None:
-                    columns_with_invalid_values.append(weather_field_label)
+                if columns_with_invalid_values:
+                    continue
 
-            if columns_with_invalid_values:
-                cls.log_parsing_warning(
-                    filename,
-                    row_num,
-                    "ValueError",
-                    "Invalid values in: " + ", ".join(columns_with_invalid_values)
-                )
-            else:
-                weather_reading = WeatherReading(
-                    date,
-                    numeric_values["MAX_TEMPERATURE"],
-                    numeric_values["MIN_TEMPERATURE"],
-                    numeric_values["MEAN_HUMIDITY"]
-                )
+            return WeatherReading(
+                date,
+                numeric_values["MAX_TEMPERATURE"],
+                numeric_values["MIN_TEMPERATURE"],
+                numeric_values["MEAN_HUMIDITY"]
+            )
         except (ValueError, TypeError) as date_parse_error:
             cls.log_parsing_warning(
                 filename,
@@ -147,25 +143,3 @@ class WeatherDataParser:
                 "InvalidDate",
                 f"Error parsing date '{date_str_from_csv}': {str(date_parse_error)}"
         )
-
-        return weather_reading
-
-    @classmethod
-    def get_first_valid_date_value(cls, date_columns, row):
-        """
-        Get the first non-empty date value from the provided date columns.
-
-        Args:
-            date_columns (list[str]): List of date column names.
-            row (dict): The row from which to extract the date.
-
-        Returns:
-            str | None: The first non-empty date as a string, or None if no valid date is found.
-        """
-        valid_date_column_values = (
-            row.get(date_column, "").strip()
-            for date_column in date_columns
-            if row.get(date_column, "").strip()
-        )
-
-        return next(valid_date_column_values, None)

@@ -26,12 +26,13 @@ class WeatherCalculator:
             reading for reading in weather_readings if reading
         ]
 
-        average_weather_readings = (
-            round(
-                sum(valid_weather_readings) / len(valid_weather_readings),
-                ROUNDED_AVERAGE_PRECISION
+        if valid_weather_readings:
+            average_weather_readings = (
+                round(
+                    sum(valid_weather_readings) / len(valid_weather_readings),
+                    ROUNDED_AVERAGE_PRECISION
+                )
             )
-        )
 
         return average_weather_readings
 
@@ -73,19 +74,18 @@ class WeatherCalculator:
         """
         yearly_calculations_result = {}
 
-        for year in [year]:
-            yearly_weather_readings = self.readings.get_readings_by_year_and_month(
-                weather_readings, year
-            )
+        yearly_weather_readings = self.readings.get_readings_by_year_and_month(
+            weather_readings, year
+        )
 
-            if not yearly_weather_readings:
-                continue
-
+        if yearly_weather_readings:
             valid_weather_readings = self.readings.get_valid_readings_by_attribute(
                 yearly_weather_readings, WEATHER_ATTRIBUTES
             )
 
-            max_values_per_attribute = self.find_max_reading_per_attribute(valid_weather_readings)
+            max_values_per_attribute = self.find_max_reading_per_attribute(
+                valid_weather_readings
+            )
 
             max_readings_per_attribute = [
                 max_values_per_attribute.get(weather_attribute)
@@ -98,7 +98,7 @@ class WeatherCalculator:
                     for input_weather_attr, yearly_stats_identifier in YEARLY_ATTRIBUTE_MAP.items()
                 }
 
-        return yearly_calculations_result
+            return yearly_calculations_result
 
     def calculate_monthly_weather_statistics(self, weather_readings, year, month):
         """
@@ -122,15 +122,13 @@ class WeatherCalculator:
             if not monthly_weather_readings:
                 continue
 
-            weather_attribute_values = []
+            weather_attribute_values = [
+                getattr(reading, weather_attribute, None)
+                for reading in monthly_weather_readings
+            ]
 
-            for reading in monthly_weather_readings:
-                weather_attribute_value = getattr(reading, weather_attribute, None)
-
-                if weather_attribute_value:
-                    weather_attribute_values.append(weather_attribute_value)
-
-            average_value = self.calculate_average(weather_attribute_values)
-            monthly_calculations_result[monthly_stats_key] = average_value
+            monthly_calculations_result[monthly_stats_key] = self.calculate_average(
+                weather_attribute_values
+            )
 
         return monthly_calculations_result
