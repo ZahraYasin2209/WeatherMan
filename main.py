@@ -1,12 +1,10 @@
 import argparse
-import os
 
 from calculations import WeatherCalculator
-from constants import WEATHER_DIRECTORY_PATH
+from constants import DEFAULT_WEATHER_DIR_PATH
 from parser import WeatherDataParser
 from weather_report_console_view import WeatherReportConsoleView
-
-DEFAULT_WEATHER_DIR_PATH = os.getenv("WEATHER_DIR", WEATHER_DIRECTORY_PATH)
+from weather_reading_helpers import WeatherReadingFilter
 
 
 class WeatherMan:
@@ -14,6 +12,7 @@ class WeatherMan:
         self.parser = WeatherDataParser()
         self.calculator = WeatherCalculator()
         self.report = WeatherReportConsoleView()
+        self.readings = WeatherReadingFilter()
 
     def run(self):
         """
@@ -79,22 +78,31 @@ class WeatherMan:
 
         if args.yearly:
             for year in args.yearly:
-                yearly_report = self.calculator.calculate_yearly_weather_statistics(
-                    weather_readings, year
-                )
-                if yearly_report:
-                    self.report.display_yearly_report(yearly_report)
-                else:
-                    print(f"No data available for the year {year}.")
+                try:
+                    yearly_report = self.calculator.calculate_yearly_weather_statistics(
+                        weather_readings, year
+                    )
+
+                    if yearly_report:
+                        self.report.display_yearly_report(yearly_report)
+                    else:
+                        self.report.display_no_data(year)
+                except ValueError:
+                    print(f"Invalid format for monthly report: '{year}'. Please use YEAR/MONTH Format")
 
         if args.monthly:
             for option in args.monthly:
                 try:
                     year, month = map(int, option.split("/"))
+
                     monthly_report = self.calculator.calculate_monthly_weather_statistics(
                         weather_readings, year, month
                     )
-                    self.report.display_monthly_report(monthly_report, year, month)
+
+                    if monthly_report:
+                        self.report.display_monthly_report(monthly_report, year, month)
+                    else:
+                        self.report.display_no_data(year, month)
                 except ValueError:
                     print(f"Invalid format for monthly report: {option}. Please use YEAR/MONTH Format")
 
@@ -102,7 +110,15 @@ class WeatherMan:
             for option in chart_args or []:
                 try:
                     year, month = map(int, option.split("/"))
-                    self.report.display_temp_chart(weather_readings, year, month, horizontal=horizontal)
+
+                    monthly_weather_readings = self.readings.get_sorted_readings_by_year_and_month(
+                        weather_readings, year, month
+                    )
+
+                    if not monthly_weather_readings:
+                        self.report.display_no_data(year, month)
+                    else:
+                        self.report.display_temp_chart(monthly_weather_readings, horizontal=horizontal)
                 except ValueError:
                     print(f"Invalid format for chart: {option}. Please use YEAR/MONTH Format")
 

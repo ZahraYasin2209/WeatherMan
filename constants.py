@@ -1,4 +1,9 @@
-WEATHER_DIRECTORY_PATH = "../../weatherfiles"
+from pathlib import Path
+
+WEATHER_DIRECTORY = "weatherfiles"
+CURRENT_SCRIPT_DIRECTORY = Path(__file__).resolve().parent
+WEATHER_PROJECT_DIRECTORY = CURRENT_SCRIPT_DIRECTORY .parents[1]
+DEFAULT_WEATHER_DIR_PATH = WEATHER_PROJECT_DIRECTORY / WEATHER_DIRECTORY
 
 DATE_COLUMNS = ["PKT", "PKST"]
 LOG_FILE = "weatherman_log_errors.log"

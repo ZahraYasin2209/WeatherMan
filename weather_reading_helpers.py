@@ -8,12 +8,12 @@ from constants import (
 
 class WeatherReadingFilter:
     @staticmethod
-    def get_sorted_readings_by_year_and_month(weather_readings, year, month):
+    def get_sorted_readings_by_year_and_month(readings, year, month):
         """
         Filter readings to include only those where specified attributes are not None.
 
         Args:
-             weather_readings (list[WeatherReading]): List of weather reading objects.
+             readings (list[WeatherReading]): List of weather reading objects.
              year (int): The year to filter by.
              month (int): The month to filter by (1–12).
 
@@ -24,7 +24,7 @@ class WeatherReadingFilter:
         return sorted(
             [
                 reading
-                for reading in weather_readings
+                for reading in readings
                 if reading.date.year == year and reading.date.month == month
             ],
             key=lambda reading: reading.date
@@ -53,7 +53,7 @@ class WeatherReadingFilter:
             for reading in weather_readings:
                 attribute_value = getattr(reading, weather_attribute)
 
-                if attribute_value is not None:
+                if attribute_value:
                     valid_weather_readings.append(reading)
 
             filtered_valid_readings_by_attribute[weather_attribute] = valid_weather_readings
