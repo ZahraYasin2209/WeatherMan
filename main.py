@@ -87,7 +87,7 @@ class WeatherMan:
                         year=year
                     )
                 except ValueError:
-                    print(f"Invalid format for yearly report: '{year}'. Please use YEAR Format")
+                    print(f"Invalid format for monthly report: {year}. Please use YEAR Format")
 
         if args.monthly:
             for monthly_option in args.monthly:

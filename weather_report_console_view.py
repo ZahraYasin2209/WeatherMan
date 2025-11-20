@@ -85,7 +85,6 @@ class WeatherReportConsoleView:
         Returns:
             None
         """
-
         monthly_weather_report = (
             f"Highest Average: {monthly_statistics["highest_average_temp"]}C\n"
             f"Lowest Average: {monthly_statistics["lowest_average_temp"]}C\n"
@@ -121,7 +120,9 @@ class WeatherReportConsoleView:
             for temp_chart_line in (temp_bars if isinstance(temp_bars, list) else [temp_bars]):
                 print(temp_chart_line)
 
-    def display_weather_report(self, weather_data_category, weather_report_data, year=None, month=None, horizontal=False):
+    def display_weather_report(
+            self, weather_data_category, weather_report_data, year=None, month=None, horizontal=False
+    ):
         """
         A helper function to display the data (yearly, monthly, or charts).
         It checks if the data exists and displays it or shows 'no data' message.

@@ -33,7 +33,6 @@ class WeatherCalculator:
                     ROUNDED_AVERAGE_PRECISION
                 )
             )
-
             return average_weather_readings
 
     @staticmethod
@@ -72,33 +71,32 @@ class WeatherCalculator:
         Returns:
             dict: Dictionary of yearly statistics if valid readings.
         """
-        yearly_calculations_result = {}
+        yearly_calculations_result = None
 
         yearly_weather_readings = self.readings.get_readings_by_year_and_month(
             weather_readings, year
         )
 
-        if yearly_weather_readings:
-            valid_weather_readings = self.readings.get_valid_readings_by_attribute(
-                yearly_weather_readings, WEATHER_ATTRIBUTES
-            )
+        valid_weather_readings = self.readings.get_valid_readings_by_attribute(
+            yearly_weather_readings, WEATHER_ATTRIBUTES
+        )
 
+        max_readings_per_attribute = all(
+            valid_weather_readings[attr]
+            for attr in WEATHER_ATTRIBUTES
+        )
+
+        if max_readings_per_attribute:
             max_values_per_attribute = self.find_max_reading_per_attribute(
                 valid_weather_readings
             )
 
-            max_readings_per_attribute = [
-                max_values_per_attribute.get(weather_attribute)
-                for weather_attribute in WEATHER_ATTRIBUTES
-            ]
+            yearly_calculations_result = {
+                yearly_stats_identifier: max_values_per_attribute.get(input_weather_attr)
+                for input_weather_attr, yearly_stats_identifier in YEARLY_ATTRIBUTE_MAP.items()
+            }
 
-            if any(max_readings_per_attribute):
-                yearly_calculations_result = {
-                    yearly_stats_identifier: max_values_per_attribute.get(input_weather_attr)
-                    for input_weather_attr, yearly_stats_identifier in YEARLY_ATTRIBUTE_MAP.items()
-                }
-
-            return yearly_calculations_result
+        return yearly_calculations_result
 
     def calculate_monthly_weather_statistics(self, weather_readings, year, month):
         """
