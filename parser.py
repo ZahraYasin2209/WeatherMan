@@ -31,11 +31,11 @@ class WeatherDataParser:
             int | None: Converted integer, or None if conversion fails.
         """
         try:
-            parsed_value = int(raw_value)
+            parsed_integer_value = int(raw_value)
         except (ValueError, TypeError):
-            parsed_value = None
+            parsed_integer_value = None
 
-        return parsed_value
+        return parsed_integer_value
 
     @staticmethod
     def log_parsing_warning(weather_file_name, row_num, error_type, message):
@@ -110,26 +110,25 @@ class WeatherDataParser:
             WeatherReading | None: A WeatherReading object if the row is valid,
             otherwise None if there are missing or invalid values.
         """
-        valid_date_column_values = (
-            date_column_value
-            for date_column in DATE_COLUMNS
-            for date_column_value in [weather_file_row.get(date_column, "").strip()]
-            if date_column_value
+        date_str_from_csv = next(
+            (
+                date_column_value
+                for date_column_value in (
+                weather_file_row.get(date_column_name, "").strip()
+                for date_column_name in DATE_COLUMNS
+            )
+                if date_column_value
+            ),
+            None
         )
-
-        date_str_from_csv = next(valid_date_column_values, None)
 
         try:
             date = datetime.strptime(date_str_from_csv, "%Y-%m-%d").date()
             numeric_values = {}
-            columns_with_invalid_values = []
 
             for weather_field_identifier, weather_field_label in NUMERIC_FIELDS.items():
-                numeric_value = cls.parse_value_to_int( weather_file_row.get(weather_field_label))
+                numeric_value = cls.parse_value_to_int(weather_file_row.get(weather_field_label))
                 numeric_values[weather_field_identifier] = numeric_value
-
-                if columns_with_invalid_values:
-                    continue
 
             return WeatherReading(
                 date,

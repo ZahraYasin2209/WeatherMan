@@ -153,9 +153,6 @@ class WeatherReportConsoleView:
             year (int, optional): Year for the report or chart. Defaults to None.
             month (int, optional): Month for the report or chart. Defaults to None.
             horizontal (bool, optional): If True, display horizontal chart. Defaults to False.
-
-        Returns:
-            None
         """
         weather_report_display_method = self.get_weather_data_display_method(weather_data_category, horizontal)
 
