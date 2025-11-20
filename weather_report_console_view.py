@@ -48,9 +48,11 @@ class WeatherReportConsoleView:
             "highest_mean_humidity_day": ("Humidity", "mean_humidity", "%"),
         }
 
-        for weather_attribute_key, (
-                weather_attribute_label, weather_attribute, weather_unit_of_measurement
-        ) in weather_attribute_labels.items():
+        for weather_attribute_key, weather_attribute_values in weather_attribute_labels.items():
+            weather_attribute_label, weather_attribute, weather_unit_of_measurement = (
+                weather_attribute_values
+            )
+
             weather_reading = yearly_statistics.get(weather_attribute_key)
 
             if not weather_reading:
@@ -58,15 +60,14 @@ class WeatherReportConsoleView:
 
             weather_reading_measurement = getattr(weather_reading, weather_attribute, None)
 
-            if weather_reading_measurement:
-                weather_report_date = weather_reading.date.strftime("%B %d")
+            weather_report_date = weather_reading.date.strftime("%B %d")
 
-                yearly_weather_report = (
-                    f"{weather_attribute_label}: {weather_reading_measurement}{weather_unit_of_measurement} "
-                    f"on {weather_report_date}"
-                )
+            yearly_weather_report = (
+                f"{weather_attribute_label}: {weather_reading_measurement}{weather_unit_of_measurement} "
+                f"on {weather_report_date}"
+            )
 
-                print(yearly_weather_report)
+            print(yearly_weather_report)
 
     def display_monthly_report(self, monthly_statistics, year=None, month=None):
         """
@@ -134,12 +135,22 @@ class WeatherReportConsoleView:
             month (int, optional): Month for the report or chart. Defaults to None.
             horizontal (bool, optional): If True, display horizontal chart. Defaults to False.
         """
-        if weather_report_data:
-            if weather_data_category == "yearly":
-                self.display_yearly_report(weather_report_data)
-            elif weather_data_category == "monthly":
-                self.display_monthly_report(weather_report_data, year, month)
-            elif weather_data_category == "chart":
-                self.display_temp_chart(weather_report_data, horizontal)
+
+        weather_report_display_methods = {
+            "yearly": self.display_yearly_report,
+            "monthly": lambda weather_report_data: self.display_monthly_report(
+                weather_report_data, year, month
+            ),
+            "chart": lambda weather_report_data: self.display_temp_chart(
+                weather_report_data, horizontal
+            )
+        }
+
+        weather_report_display_method = weather_report_display_methods.get(
+            weather_data_category
+        )
+
+        if weather_report_data and weather_report_display_method:
+            weather_report_display_method(weather_report_data)
         else:
             self.display_no_data(year, month)

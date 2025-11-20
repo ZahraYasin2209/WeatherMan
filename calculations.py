@@ -26,14 +26,13 @@ class WeatherCalculator:
             reading for reading in weather_readings if reading
         ]
 
-        if valid_weather_readings:
-            average_weather_readings = (
-                round(
-                    sum(valid_weather_readings) / len(valid_weather_readings),
-                    ROUNDED_AVERAGE_PRECISION
-                )
-            )
-            return average_weather_readings
+        average_readings = (
+            sum(valid_weather_readings) / len(valid_weather_readings)
+            if valid_weather_readings else 0
+        )
+        average_weather_readings = round(average_readings, ROUNDED_AVERAGE_PRECISION)
+
+        return average_weather_readings
 
     @staticmethod
     def find_max_reading_per_attribute(attribute_readings):

@@ -111,9 +111,10 @@ class WeatherDataParser:
             otherwise None if there are missing or invalid values.
         """
         valid_date_column_values = (
-            row.get(date_column, "").strip()
+            date_column_value
             for date_column in DATE_COLUMNS
-            if row.get(date_column, "").strip()
+            for date_column_value in [row.get(date_column, "").strip()]
+            if date_column_value
         )
 
         date_str_from_csv = next(valid_date_column_values, None)

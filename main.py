@@ -106,9 +106,9 @@ class WeatherMan:
                     print(f"Invalid format for monthly report: {monthly_option}. Please use YEAR/MONTH Format")
 
         for chart_args, horizontal in [(args.chart, False), (args.hchart, True)]:
-            for option in chart_args or []:
+            for weather_chart in chart_args or []:
                 try:
-                    year, month = map(int, option.split("/"))
+                    year, month = map(int, weather_chart.split("/"))
                     monthly_weather_readings = self.readings.get_sorted_readings_by_year_and_month(
                         weather_readings, year, month
                     )
@@ -120,7 +120,7 @@ class WeatherMan:
                         horizontal=horizontal
                     )
                 except ValueError:
-                    print(f"Invalid format for chart: {option}. Please use YEAR/MONTH Format")
+                    print(f"Invalid format for chart: {weather_chart}. Please use YEAR/MONTH Format")
 
 
 if __name__ == "__main__":
