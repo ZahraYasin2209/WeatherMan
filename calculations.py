@@ -1,4 +1,5 @@
 from constants import (
+    AVERAGE_DEFAULT_VALUE,
     MONTHLY_ATTRIBUTE_MAP,
     ROUNDED_AVERAGE_PRECISION,
     WEATHER_ATTRIBUTES,
@@ -20,7 +21,7 @@ class WeatherCalculator:
             weather_readings (list[float | int | None]): List of readings
 
         Returns:
-            float: Rounded average if valid readings else 0.0
+            float: Rounded average if valid readings else AVERAGE_DEFAULT_VALUE
         """
         valid_weather_readings = [
             reading for reading in weather_readings if reading
@@ -28,7 +29,7 @@ class WeatherCalculator:
 
         average_readings = (
             sum(valid_weather_readings) / len(valid_weather_readings)
-            if valid_weather_readings else 0.0
+            if valid_weather_readings else AVERAGE_DEFAULT_VALUE
         )
         average_weather_readings = round(average_readings, ROUNDED_AVERAGE_PRECISION)
 
