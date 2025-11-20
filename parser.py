@@ -113,11 +113,8 @@ class WeatherDataParser:
         date_str_from_csv = next(
             (
                 date_column_value
-                for date_column_value in (
-                weather_file_row.get(date_column_name, "").strip()
-                for date_column_name in DATE_COLUMNS
-            )
-                if date_column_value
+                for date_column in DATE_COLUMNS
+                if (date_column_value := weather_file_row.get(date_column, "").strip())
             ),
             None
         )
