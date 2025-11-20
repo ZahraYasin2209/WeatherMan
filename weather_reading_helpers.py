@@ -75,12 +75,12 @@ class WeatherReadingFilter:
 
 class WeatherReadingFormatter:
     @staticmethod
-    def format_temperature_bars(reading, horizontal=False):
+    def format_temperature_bars(weather_reading, horizontal=False):
         """
         Generate temperature bar(s) for a single reading.
 
         Args:
-            reading (WeatherReading): The weather reading.
+            weather_reading (WeatherReading): The weather reading.
             horizontal (bool): If True, return a horizontal bar format.
 
         Returns:
@@ -88,18 +88,18 @@ class WeatherReadingFormatter:
         """
         temp_bars_formatter = None
 
-        if reading.max_temp and reading.min_temp:
-            day = f"{reading.date.day:02d}"
+        if weather_reading.max_temp and weather_reading.min_temp:
+            day = f"{weather_reading.date.day:02d}"
 
-            min_temp_bar = f"{BLUE}{'+' * max(0, reading.min_temp)}"
-            max_temp_bar = f"{RED}{'+' * max(0, reading.max_temp)}"
-            temp_values = f"{PURPLE} {reading.min_temp}C - {reading.max_temp}C {RESET}"
+            min_temp_bar = f"{BLUE}{'+' * max(0, weather_reading.min_temp)}"
+            max_temp_bar = f"{RED}{'+' * max(0, weather_reading.max_temp)}"
+            temp_values = f"{PURPLE} {weather_reading.min_temp}C - {weather_reading.max_temp}C {RESET}"
 
             temp_bars_formatter = (
                 f"{day} {min_temp_bar}+{max_temp_bar}{temp_values}" if horizontal else
                 [
-                    f"{day} {max_temp_bar} {PURPLE}{reading.max_temp}C {RESET}",
-                    f"{day} {min_temp_bar} {PURPLE}{reading.min_temp}C {RESET}"
+                    f"{day} {max_temp_bar} {PURPLE}{weather_reading.max_temp}C {RESET}",
+                    f"{day} {min_temp_bar} {PURPLE}{weather_reading.min_temp}C {RESET}"
                 ]
             )
 

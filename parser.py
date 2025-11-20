@@ -20,35 +20,35 @@ logging.basicConfig(
 
 class WeatherDataParser:
     @staticmethod
-    def parse_value_to_int(value):
+    def parse_value_to_int(raw_value):
         """
         Convert a value to an integer.
 
         Args:
-            value (str | int | None): The value to convert in an integer.
+            raw_value (str | int | None): The value to convert in an integer.
 
         Returns:
             int | None: Converted integer, or None if conversion fails.
         """
         try:
-            value_parser = int(value)
+            parsed_value = int(raw_value)
         except (ValueError, TypeError):
-            value_parser = None
+            parsed_value = None
 
-        return value_parser
+        return parsed_value
 
     @staticmethod
-    def log_parsing_warning(filename, row_num, error_type, message):
+    def log_parsing_warning(weather_file_name, row_num, error_type, message):
         """
         Log a parsing warning for invalid or missing data.
 
         Args:
-            filename (str): The name of CSV file.
+            weather_file_name (str): The name of CSV file.
             row_num (int): The row number in that CSV file.
             error_type (str): Type of error or warning.
             message (str): Message about the warning.
         """
-        logging.warning(f"{filename}, row {row_num}: {error_type} - {message}")
+        logging.warning(f"{weather_file_name}, row {row_num}: {error_type} - {message}")
 
     @classmethod
     def parse_directory_to_readings(cls, directory):
@@ -56,38 +56,38 @@ class WeatherDataParser:
         Parse all CSV files in a directory into WeatherReading objects.
 
         Args:
-            directory (str | Path): Path to the directory containing weather CSV files.
+            directory (str): Path to the directory containing weather CSV files.
 
         Returns:
             list[WeatherReading]: A list of WeatherReading objects parsed from all files in the directory.
         """
         parsed_weather_readings = []
 
-        for file_path in Path(directory).iterdir():
-            parsed_weather_readings.extend(cls.parse_file_to_readings(file_path))
+        for weather_data_file in Path(directory).iterdir():
+            parsed_weather_readings.extend(cls.parse_file_to_readings(weather_data_file))
 
         return parsed_weather_readings
 
     @classmethod
-    def parse_file_to_readings(cls, file_path):
+    def parse_file_to_readings(cls, weather_file_path):
         """
         Parse a single CSV file into WeatherReading objects.
 
         Args:
-            file_path (str | Path): Path to the CSV file to parse.
+            weather_file_path (str | Path): Path to the CSV file to parse.
 
         Returns:
             list[WeatherReading]: A list of WeatherReading objects parsed from the file.
         """
         weather_readings = []
 
-        with file_path.open("r", encoding="utf-8") as weather_file:
+        with weather_file_path.open("r", encoding="utf-8") as weather_file:
             weather_file_rows = csv.DictReader(weather_file)
 
             for weather_file_row in weather_file_rows:
                 weather_reading = cls.parse_row_to_reading(
                     weather_file_row,
-                    file_path.name,
+                    weather_file_path.name,
                     weather_file_rows.line_num
                 )
 
@@ -97,14 +97,14 @@ class WeatherDataParser:
         return weather_readings
 
     @classmethod
-    def parse_row_to_reading(cls, row, filename, row_num):
+    def parse_row_to_reading(cls, weather_file_row, weather_file_name, weather_file_row_num):
         """
         Parse a single row from a CSV file into a WeatherReading object.
 
         Args:
-            row (dict): A dictionary representing a CSV row.
-            filename (str): Name of the file being parsed.
-            row_num (int): The row number in the CSV file.
+            weather_file_row (dict): A dictionary representing a CSV row.
+            weather_file_name (str): Name of the file being parsed.
+            weather_file_row_num (int): The row number in the CSV file.
 
         Returns:
             WeatherReading | None: A WeatherReading object if the row is valid,
@@ -113,7 +113,7 @@ class WeatherDataParser:
         valid_date_column_values = (
             date_column_value
             for date_column in DATE_COLUMNS
-            for date_column_value in [row.get(date_column, "").strip()]
+            for date_column_value in [weather_file_row.get(date_column, "").strip()]
             if date_column_value
         )
 
@@ -125,7 +125,7 @@ class WeatherDataParser:
             columns_with_invalid_values = []
 
             for weather_field_identifier, weather_field_label in NUMERIC_FIELDS.items():
-                numeric_value = cls.parse_value_to_int(row.get(weather_field_label))
+                numeric_value = cls.parse_value_to_int( weather_file_row.get(weather_field_label))
                 numeric_values[weather_field_identifier] = numeric_value
 
                 if columns_with_invalid_values:
@@ -139,8 +139,8 @@ class WeatherDataParser:
             )
         except (ValueError, TypeError) as date_parse_error:
             cls.log_parsing_warning(
-                filename,
-                row_num,
+                weather_file_name,
+                weather_file_row_num,
                 "InvalidDate",
                 f"Error parsing date '{date_str_from_csv}': {str(date_parse_error)}"
         )

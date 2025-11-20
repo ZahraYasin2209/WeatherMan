@@ -19,8 +19,7 @@ class WeatherMan:
         Parse Command-Line Arguments and execute requested weather reports or temperature charts.
 
         Command-line arguments supported:
-            directory (str, optional): Path to directory containing weather files.
-                                            Default set to DEFAULT_WEATHER_DIR_PATH.
+            directory (str): Path to directory containing weather files.
             -e, --yearly YEAR [YEAR ...]: Generate yearly reports for given YEAR(s).
             -a, --monthly YEAR/MONTH [YEAR/MONTH ...]: Generate monthly averages.
             -c, --chart YEAR/MONTH [YEAR/MONTH ...]: Generate vertical monthly charts.
@@ -90,9 +89,9 @@ class WeatherMan:
                     print(f"Invalid format for monthly report: {year}. Please use YEAR Format")
 
         if args.monthly:
-            for monthly_option in args.monthly:
+            for month in args.monthly:
                 try:
-                    year, month = map(int, monthly_option.split("/"))
+                    year, month = map(int, month.split("/"))
                     monthly_report = self.calculator.calculate_monthly_weather_statistics(
                         weather_readings, year, month
                     )
@@ -103,12 +102,12 @@ class WeatherMan:
                         month=month
                     )
                 except ValueError:
-                    print(f"Invalid format for monthly report: {monthly_option}. Please use YEAR/MONTH Format")
+                    print(f"Invalid format for monthly report: {month}. Please use YEAR/MONTH Format")
 
         for chart_args, horizontal in [(args.chart, False), (args.hchart, True)]:
-            for weather_chart in chart_args or []:
+            for monthly_weather_chart in chart_args or []:
                 try:
-                    year, month = map(int, weather_chart.split("/"))
+                    year, month = map(int, monthly_weather_chart.split("/"))
                     monthly_weather_readings = self.readings.get_sorted_readings_by_year_and_month(
                         weather_readings, year, month
                     )
@@ -120,7 +119,7 @@ class WeatherMan:
                         horizontal=horizontal
                     )
                 except ValueError:
-                    print(f"Invalid format for chart: {weather_chart}. Please use YEAR/MONTH Format")
+                    print(f"Invalid format for chart: {monthly_weather_chart}. Please use YEAR/MONTH Format")
 
 
 if __name__ == "__main__":
