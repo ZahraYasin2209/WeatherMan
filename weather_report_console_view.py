@@ -98,7 +98,7 @@ class WeatherReportConsoleView:
         weather_report_display_methods = {
             "yearly": self.display_yearly_report,
             "monthly": self.display_monthly_report,
-            "chart": lambda data: self.display_temp_chart(data, horizontal)
+            "chart": lambda weather_data: self.display_temp_chart(weather_data, horizontal)
         }
 
         return weather_report_display_methods.get(weather_data_category)
