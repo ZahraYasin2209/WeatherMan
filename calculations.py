@@ -88,18 +88,3 @@ class WeatherCalculator:
         max_values_per_attribute = self.find_max_reading_per_attribute(valid_weather_readings)
 
         return self.readings.get_yearly_max_weather_values(max_values_per_attribute)
-
-    def calculate_monthly_weather_statistics(self, monthly_weather_readings):
-        """
-        Calculate monthly weather statistics from a list of weather readings.
-
-        Args:
-            monthly_weather_readings (list[WeatherReading]): List of weather readings for a specific month.
-
-        Returns:
-            dict: A dictionary containing calculated monthly averages
-            if readings are available.
-        """
-
-        if monthly_weather_readings:
-            return self.calculate_monthly_averages(monthly_weather_readings)

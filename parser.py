@@ -170,7 +170,7 @@ class InputDateParser:
             raise ValueError(f"Invalid format for year: {raw_input_year}. Please use YEAR Format")
 
     @staticmethod
-    def parse_and_validate_year_month(raw_year_month):
+    def parse_and_validate_year_and_month(raw_year_month):
         """
         Parse and validate a YEAR/MONTH string given by user (through CLI arguments).
 

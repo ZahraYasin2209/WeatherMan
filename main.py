@@ -91,7 +91,8 @@ class WeatherMan:
             for raw_year in args.yearly:
                 try:
                     year = self.date_parser.parse_and_validate_year(raw_year)
-                    yearly_weather_readings = self.reading_filter.get_yearly_weather_readings(
+
+                    yearly_weather_readings = self.reading_filter.get_readings_by_year_and_month(
                         weather_readings,
                         year
                     )
@@ -120,29 +121,30 @@ class WeatherMan:
         if args.monthly:
             for raw_month in args.monthly:
                 try:
-                    year, month = self.date_parser.parse_and_validate_year_month(raw_month)
+                    year, month = self.date_parser.parse_and_validate_year_and_month(raw_month)
 
                     monthly_weather_readings = self.reading_filter.get_sorted_readings_by_year_and_month(
                         weather_readings, year, month
                     )
 
-                    monthly_report = self.weather_calculator.calculate_monthly_weather_statistics(
-                        monthly_weather_readings
-                    )
+                    if monthly_weather_readings:
+                        monthly_report = self.weather_calculator.calculate_monthly_averages(
+                            monthly_weather_readings
+                        )
 
-                    self.report.display_weather_report(
-                        "monthly",
-                        monthly_report,
-                        year=year,
-                        month=month
-                    )
+                        self.report.display_weather_report(
+                            "monthly",
+                            monthly_report,
+                            year=year,
+                            month=month
+                        )
                 except ValueError as date_input_error:
                     print(date_input_error)
 
         for chart_args, horizontal in [(args.chart, False), (args.hchart, True)]:
             for monthly_weather_chart in chart_args or []:
                 try:
-                    year, month = self.date_parser.parse_and_validate_year_month(monthly_weather_chart)
+                    year, month = self.date_parser.parse_and_validate_year_and_month(monthly_weather_chart)
 
                     monthly_weather_readings = self.reading_filter.get_sorted_readings_by_year_and_month(
                         weather_readings, year, month

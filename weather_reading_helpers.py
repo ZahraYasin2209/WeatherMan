@@ -73,19 +73,6 @@ class WeatherReadingFilter:
             if reading.date.year == year and (month is None or reading.date.month == month)
         ]
 
-    def get_yearly_weather_readings(self, weather_readings, year):
-        """
-        Return all readings for a specified year.
-
-        Args:
-            weather_readings (list[WeatherReading]): List of weather reading objects.
-            year (int): Year to filter by.
-
-        Returns:
-            list[WeatherReading]: List of readings for the specified year.
-        """
-        return self.get_readings_by_year_and_month(weather_readings, year)
-
     @staticmethod
     def get_yearly_max_weather_values(max_values_per_attribute):
         """
