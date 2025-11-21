@@ -1,11 +1,15 @@
 import argparse
 
 from calculations import WeatherCalculator
-from constants import DEFAULT_WEATHER_DIR_PATH
+from constants import (
+    DEFAULT_WEATHER_DIR_PATH,
+    WEATHER_ATTRIBUTES
+)
 from parser import (
     InputDateParser,
     WeatherDataParser
 )
+from validations import WeatherReadingValidator
 from weather_reading_helpers import WeatherReadingFilter
 from weather_report_console_view import WeatherReportConsoleView
 
@@ -17,6 +21,7 @@ class WeatherMan:
         self.weather_data_parser = WeatherDataParser()
         self.reading_filter = WeatherReadingFilter()
         self.report = WeatherReportConsoleView()
+        self.reading_validator = WeatherReadingValidator()
 
     def run(self):
         """
@@ -82,9 +87,18 @@ class WeatherMan:
             for raw_year in args.yearly:
                 try:
                     year = self.date_parser.parse_and_validate_year(raw_year)
+                    yearly_weather_readings = self.reading_filter.get_yearly_weather_readings(
+                        weather_readings,
+                        year
+                    )
+
+                    valid_weather_readings = self.reading_validator.validate_yearly_weather_readings_by_attribute(
+                        yearly_weather_readings,
+                        WEATHER_ATTRIBUTES
+                    )
 
                     yearly_report = self.weather_calculator.calculate_yearly_weather_statistics(
-                        weather_readings, year
+                        valid_weather_readings
                     )
 
                     self.report.display_weather_report(
@@ -100,8 +114,12 @@ class WeatherMan:
                 try:
                     year, month = self.date_parser.parse_and_validate_year_month(raw_month)
 
-                    monthly_report = self.weather_calculator.calculate_monthly_weather_statistics(
+                    monthly_weather_readings = self.reading_filter.get_sorted_readings_by_year_and_month(
                         weather_readings, year, month
+                    )
+
+                    monthly_report = self.weather_calculator.calculate_monthly_weather_statistics(
+                        monthly_weather_readings
                     )
 
                     self.report.display_weather_report(
