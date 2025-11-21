@@ -161,8 +161,10 @@ class InputDateParser:
         """
         try:
             year = int(raw_input_year)
+
             if year <= 0:
                 raise ValueError
+
             return year
         except ValueError:
             raise ValueError(f"Invalid format for year: {raw_input_year}. Please use YEAR Format")
@@ -183,6 +185,7 @@ class InputDateParser:
         """
         try:
             year, month = map(int, raw_year_month.split("/"))
+
             return year, month
         except ValueError:
             raise ValueError(

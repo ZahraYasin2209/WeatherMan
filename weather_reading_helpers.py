@@ -3,7 +3,6 @@ from constants import (
     PURPLE,
     RED,
     RESET,
-    WEATHER_ATTRIBUTES,
     YEARLY_ATTRIBUTE_MAP
 )
 
@@ -86,23 +85,6 @@ class WeatherReadingFilter:
             list[WeatherReading]: List of readings for the specified year.
         """
         return self.get_readings_by_year_and_month(weather_readings, year)
-
-    @staticmethod
-    def get_all_attributes_with_valid_readings(valid_weather_readings):
-        """
-        Check if all weather attributes have valid (non-empty) readings.
-
-        Args:
-            valid_weather_readings (dict[str, list[WeatherReading]]):
-            Dictionary of readings by attribute.
-
-        Returns:
-            bool: True if all attributes have at least one valid reading, False otherwise.
-        """
-        return (
-            all(valid_weather_readings[weather_attribute]
-                for weather_attribute in WEATHER_ATTRIBUTES)
-        )
 
     @staticmethod
     def get_yearly_max_weather_values(max_values_per_attribute):

@@ -2,7 +2,6 @@ from constants import (
     AVERAGE_DEFAULT_VALUE,
     MONTHLY_ATTRIBUTE_MAP,
     ROUNDED_AVERAGE_PRECISION,
-    WEATHER_ATTRIBUTES,
 )
 from validations import WeatherReadingValidator
 from weather_reading_helpers import WeatherReadingFilter
