@@ -9,8 +9,8 @@ from weather_reading_helpers import WeatherReadingFilter
 
 class WeatherCalculator:
     def __init__(self):
-        self.readings = WeatherReadingFilter()
-        self.validator = WeatherReadingValidator()
+        self.weather_readings = WeatherReadingFilter()
+        self.readings_validator = WeatherReadingValidator()
 
     @staticmethod
     def calculate_average(weather_readings):
@@ -42,7 +42,7 @@ class WeatherCalculator:
             dict: A dictionary mapping each average key to its calculated average.
         """
         return {
-            monthly_average_key: self.validator.validate_and_calculate_average_for_attribute(
+            monthly_average_key: self.readings_validator.validate_and_calculate_average_for_attribute(
                 monthly_weather_readings, weather_attribute
             )
             for weather_attribute, monthly_average_key in MONTHLY_ATTRIBUTE_MAP.items()
@@ -87,4 +87,4 @@ class WeatherCalculator:
         """
         max_values_per_attribute = self.find_max_reading_per_attribute(valid_weather_readings)
 
-        return self.readings.get_yearly_max_weather_values(max_values_per_attribute)
+        return self.weather_readings.get_yearly_max_weather_values(max_values_per_attribute)
