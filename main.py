@@ -2,17 +2,21 @@ import argparse
 
 from calculations import WeatherCalculator
 from constants import DEFAULT_WEATHER_DIR_PATH
-from parser import WeatherDataParser
+from parser import (
+    InputDateParser,
+    WeatherDataParser
+)
 from weather_reading_helpers import WeatherReadingFilter
 from weather_report_console_view import WeatherReportConsoleView
 
 
 class WeatherMan:
     def __init__(self):
-        self.parser = WeatherDataParser()
-        self.calculator = WeatherCalculator()
+        self.date_parser = InputDateParser()
+        self.weather_calculator = WeatherCalculator()
+        self.weather_data_parser = WeatherDataParser()
+        self.reading_filter = WeatherReadingFilter()
         self.report = WeatherReportConsoleView()
-        self.readings = WeatherReadingFilter()
 
     def run(self):
         """
@@ -72,45 +76,52 @@ class WeatherMan:
 
         args = parser.parse_args()
 
-        weather_readings = self.parser.parse_directory_to_readings(args.directory)
+        weather_readings = self.weather_data_parser.parse_directory_to_readings(args.directory)
 
         if args.yearly:
-            for year in args.yearly:
+            for raw_year in args.yearly:
                 try:
-                    yearly_report = self.calculator.calculate_yearly_weather_statistics(
+                    year = self.date_parser.parse_and_validate_year(raw_year)
+
+                    yearly_report = self.weather_calculator.calculate_yearly_weather_statistics(
                         weather_readings, year
                     )
+
                     self.report.display_weather_report(
                         "yearly",
                         yearly_report,
                         year=year
                     )
-                except ValueError:
-                    print(f"Invalid format for monthly report: {year}. Please use YEAR Format")
+                except ValueError as date_input_error:
+                    print(date_input_error)
 
         if args.monthly:
-            for month in args.monthly:
+            for raw_month in args.monthly:
                 try:
-                    year, month = map(int, month.split("/"))
-                    monthly_report = self.calculator.calculate_monthly_weather_statistics(
+                    year, month = self.date_parser.parse_and_validate_year_month(raw_month)
+
+                    monthly_report = self.weather_calculator.calculate_monthly_weather_statistics(
                         weather_readings, year, month
                     )
+
                     self.report.display_weather_report(
                         "monthly",
                         monthly_report,
                         year=year,
                         month=month
                     )
-                except ValueError:
-                    print(f"Invalid format for monthly report: {month}. Please use YEAR/MONTH Format")
+                except ValueError as date_input_error:
+                    print(date_input_error)
 
         for chart_args, horizontal in [(args.chart, False), (args.hchart, True)]:
             for monthly_weather_chart in chart_args or []:
                 try:
-                    year, month = map(int, monthly_weather_chart.split("/"))
-                    monthly_weather_readings = self.readings.get_sorted_readings_by_year_and_month(
+                    year, month = self.date_parser.parse_and_validate_year_month(monthly_weather_chart)
+
+                    monthly_weather_readings = self.reading_filter.get_sorted_readings_by_year_and_month(
                         weather_readings, year, month
                     )
+
                     self.report.display_weather_report(
                         "chart",
                         monthly_weather_readings,
@@ -118,8 +129,8 @@ class WeatherMan:
                         month=month,
                         horizontal=horizontal
                     )
-                except ValueError:
-                    print(f"Invalid format for chart: {monthly_weather_chart}. Please use YEAR/MONTH Format")
+                except ValueError as date_input_error:
+                    print(date_input_error)
 
 
 if __name__ == "__main__":

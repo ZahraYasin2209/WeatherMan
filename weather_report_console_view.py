@@ -27,8 +27,7 @@ class WeatherReportConsoleView:
             else "No data available."
         )
 
-    @staticmethod
-    def display_yearly_report(yearly_statistics):
+    def display_yearly_report(self, yearly_statistics):
         """
         Display the yearly weather report including highest temperature, lowest temperature,
         and highest mean humidity.
@@ -43,30 +42,13 @@ class WeatherReportConsoleView:
         Returns:
             None
         """
-        weather_attribute_labels = {
-            "highest_temperature": ("Highest", "max_temp", "C"),
-            "lowest_temperature": ("Lowest", "min_temp", "C"),
-            "highest_mean_humidity_day": ("Humidity", "mean_humidity", "%"),
-        }
+        yearly_weather_report = self.readings_formatter.format_yearly_weather_report(yearly_statistics)
 
-        for weather_attribute_key, weather_attribute_values in weather_attribute_labels.items():
-            weather_attribute_label, weather_attribute, weather_unit_of_measurement = (
-                weather_attribute_values
-            )
+        if not yearly_weather_report:
+            self.display_no_data()
 
-            weather_reading = yearly_statistics.get(weather_attribute_key)
-
-            if not weather_reading:
-                continue
-
-            weather_reading_measurement = getattr(weather_reading, weather_attribute, None)
-
-            yearly_weather_report = (
-                f"{weather_attribute_label}: {weather_reading_measurement}{weather_unit_of_measurement} "
-                f"on {weather_reading.date.strftime("%B %d")}"
-            )
-
-            print(yearly_weather_report)
+        for weather_report in yearly_weather_report:
+            print(weather_report)
 
     @staticmethod
     def display_monthly_report(monthly_statistics):
@@ -91,30 +73,16 @@ class WeatherReportConsoleView:
 
     def display_temp_chart(self, monthly_weather_readings, horizontal=False):
         """
-        Display a chart of temperatures for a given month.
-        Uses temperature bars (vertical or horizontal) for visualization.
+        Print the temperature chart for a given month.
 
         Args:
-            monthly_weather_readings (list[WeatherReading]):
-                List of WeatherReading objects containing temperature data.
-            horizontal (bool, optional): Whether to display horizontal bars (True)  or vertical bars (False).
-
-        Returns:
-            None
+            monthly_weather_readings (list[WeatherReading]): List of readings.
+            horizontal (bool): If True, display horizontal bars.
         """
-        print(monthly_weather_readings[0].date.strftime("%B %Y"))
+        weather_temp_bars = self.readings_formatter.format_temp_chart(monthly_weather_readings, horizontal)
 
-        for weather_reading in monthly_weather_readings:
-            temp_bars = self.readings_formatter.format_temperature_bars(
-                weather_reading,
-                horizontal
-            )
-
-            if not temp_bars:
-                continue
-
-            for temp_chart_line in (temp_bars if isinstance(temp_bars, list) else [temp_bars]):
-                print(temp_chart_line)
+        for temp_bar in weather_temp_bars:
+            print(temp_bar)
 
     def get_weather_data_display_method(self, weather_data_category, horizontal=False):
         """
@@ -154,7 +122,9 @@ class WeatherReportConsoleView:
             month (int, optional): Month for the report or chart. Defaults to None.
             horizontal (bool, optional): If True, display horizontal chart. Defaults to False.
         """
-        weather_report_display_method = self.get_weather_data_display_method(weather_data_category, horizontal)
+        weather_report_display_method = self.get_weather_data_display_method(
+            weather_data_category, horizontal
+        )
 
         if weather_report_data and weather_report_display_method:
             weather_report_display_method(weather_report_data)

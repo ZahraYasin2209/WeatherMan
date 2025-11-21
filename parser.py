@@ -124,7 +124,9 @@ class WeatherDataParser:
             numeric_values = {}
 
             for weather_field_identifier, weather_field_label in NUMERIC_FIELDS.items():
-                numeric_value = cls.parse_value_to_int(weather_file_row.get(weather_field_label))
+                numeric_value = cls.parse_value_to_int(weather_file_row.get(
+                    weather_field_label
+                ))
                 numeric_values[weather_field_identifier] = numeric_value
 
             return WeatherReading(
@@ -140,3 +142,49 @@ class WeatherDataParser:
                 "InvalidDate",
                 f"Error parsing date '{date_str_from_csv}': {str(date_parse_error)}"
         )
+
+
+class InputDateParser:
+    @staticmethod
+    def parse_and_validate_year(raw_input_year):
+        """
+        Parse and validate an YEAR given by user (through CLI arguments).
+
+        Args:
+            raw_input_year (int): Year to validate.
+
+        Returns:
+            int: Validated year.
+
+        Raises:
+            ValueError: If the input is not a valid YEAR or in incorrect format.
+        """
+        try:
+            year = int(raw_input_year)
+            if year <= 0:
+                raise ValueError
+            return year
+        except ValueError:
+            raise ValueError(f"Invalid format for year: {raw_input_year}. Please use YEAR Format")
+
+    @staticmethod
+    def parse_and_validate_year_month(raw_year_month):
+        """
+        Parse and validate a YEAR/MONTH string given by user (through CLI arguments).
+
+        Args:
+            raw_year_month (str): String in the format "YEAR/MONTH".
+
+        Returns:
+            tuple[int, int]: year and month as integers.
+
+        Raises:
+            ValueError: If the input is not in the correct format.
+        """
+        try:
+            year, month = map(int, raw_year_month.split("/"))
+            return year, month
+        except ValueError:
+            raise ValueError(
+                f"Invalid format for monthly report: {raw_year_month}. Please use YEAR/MONTH Format"
+            )
