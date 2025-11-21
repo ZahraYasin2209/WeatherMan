@@ -10,7 +10,10 @@ from parser import (
     WeatherDataParser
 )
 from validations import WeatherReadingValidator
-from weather_reading_helpers import WeatherReadingFilter
+from weather_reading_helpers import (
+    WeatherReadingFilter,
+    WeatherReadingFormatter
+)
 from weather_report_console_view import WeatherReportConsoleView
 
 
@@ -20,6 +23,7 @@ class WeatherMan:
         self.weather_calculator = WeatherCalculator()
         self.weather_data_parser = WeatherDataParser()
         self.reading_filter = WeatherReadingFilter()
+        self.reading_formatters = WeatherReadingFormatter()
         self.report = WeatherReportConsoleView()
         self.reading_validator = WeatherReadingValidator()
 
@@ -101,9 +105,13 @@ class WeatherMan:
                         valid_weather_readings
                     )
 
+                    formatted_weather_report = self.reading_formatters.format_yearly_weather_report(
+                        yearly_report
+                    )
+
                     self.report.display_weather_report(
                         "yearly",
-                        yearly_report,
+                        formatted_weather_report,
                         year=year
                     )
                 except ValueError as date_input_error:

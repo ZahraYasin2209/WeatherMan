@@ -150,7 +150,7 @@ class WeatherReadingFormatter:
             weather_reading = yearly_statistics.get(weather_attribute_key)
 
             if not weather_reading:
-                    continue
+                continue
 
             weather_reading_measurement = getattr(weather_reading, weather_attribute, None)
 

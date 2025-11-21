@@ -22,7 +22,9 @@ class WeatherReadingValidator:
             if reading
         ]
 
-    def validate_yearly_weather_readings_by_attribute(self, yearly_weather_readings, weather_attributes):
+    def validate_yearly_weather_readings_by_attribute(
+            self, yearly_weather_readings, weather_attributes
+    ):
         """
         Validate yearly weather readings for specified attributes.
 
@@ -37,3 +39,24 @@ class WeatherReadingValidator:
             yearly_weather_readings,
             weather_attributes
         )
+
+    def validate_and_calculate_average_for_attribute(self, weather_readings, weather_attribute):
+        """
+        Validate the attribute value Calculate the average for a single weather attribute.
+
+        Args:
+            weather_readings (list[WeatherReading]): List of weather readings.
+            weather_attribute (str): The attribute to calculate the average for (e.g., 'temperature').
+
+        Returns:
+            float: The average of the valid readings for the given attribute.
+        """
+        from calculations import WeatherCalculator
+
+        weather_attribute_values = self.readings.get_attribute_values(
+            weather_readings, weather_attribute
+        )
+
+        valid_attribute_values = self.validate_weather_readings(weather_attribute_values)
+
+        return WeatherCalculator.calculate_average(valid_attribute_values)

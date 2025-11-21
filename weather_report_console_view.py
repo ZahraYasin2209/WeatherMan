@@ -27,7 +27,7 @@ class WeatherReportConsoleView:
             else "No data available."
         )
 
-    def display_yearly_report(self, yearly_statistics):
+    def display_yearly_report(self, yearly_weather_report):
         """
         Display the yearly weather report including highest temperature, lowest temperature,
         and highest mean humidity.
@@ -42,11 +42,6 @@ class WeatherReportConsoleView:
         Returns:
             None
         """
-        yearly_weather_report = self.readings_formatter.format_yearly_weather_report(yearly_statistics)
-
-        if not yearly_weather_report:
-            self.display_no_data()
-
         for weather_report in yearly_weather_report:
             print(weather_report)
 

@@ -42,30 +42,11 @@ class WeatherCalculator:
             dict: A dictionary mapping each average key to its calculated average.
         """
         return {
-            monthly_average_key: self.calculate_average_for_attribute(
+            monthly_average_key: self.validator.validate_and_calculate_average_for_attribute(
                 monthly_weather_readings, weather_attribute
             )
             for weather_attribute, monthly_average_key in MONTHLY_ATTRIBUTE_MAP.items()
         }
-
-    def calculate_average_for_attribute(self, weather_readings, weather_attribute):
-        """
-        Calculate the average for a single weather attribute.
-
-        Args:
-            weather_readings (list[WeatherReading]): List of weather readings.
-            weather_attribute (str): The attribute to calculate the average for (e.g., 'temperature').
-
-        Returns:
-            float: The average of the valid readings for the given attribute.
-        """
-        weather_attribute_values = self.readings.get_attribute_values(
-            weather_readings, weather_attribute
-        )
-
-        valid_attribute_values = self.validator.validate_weather_readings(weather_attribute_values)
-
-        return self.calculate_average(valid_attribute_values)
 
     @staticmethod
     def find_max_reading_per_attribute(attribute_readings):
@@ -74,7 +55,8 @@ class WeatherCalculator:
 
         Args:
             attribute_readings (dict[str, list[WeatherReading]]):
-            Dictionary mapping weather attributes (e.g., "temperature", "humidity") to lists of WeatherReading objects.
+            Dictionary mapping weather attributes (e.g., "temperature", "humidity")
+            to lists of WeatherReading objects.
 
         Returns:
             dict[str, WeatherReading | None]: Dictionary mapping each attribute to the WeatherReading
