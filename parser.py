@@ -170,12 +170,12 @@ class InputDateParser:
             raise ValueError(f"Invalid format for year: {raw_input_year}. Please use YEAR Format")
 
     @staticmethod
-    def parse_and_validate_year_and_month(raw_year_month):
+    def parse_and_validate_year_and_month(raw_year_and_month):
         """
         Parse and validate a YEAR/MONTH string given by user (through CLI arguments).
 
         Args:
-            raw_year_month (str): String in the format "YEAR/MONTH".
+            raw_year_and_month (str): String in the format "YEAR/MONTH".
 
         Returns:
             tuple[int, int]: year and month as integers.
@@ -184,10 +184,10 @@ class InputDateParser:
             ValueError: If the input is not in the correct format.
         """
         try:
-            year, month = map(int, raw_year_month.split("/"))
+            year, month = map(int, raw_year_and_month.split("/"))
 
             return year, month
         except ValueError:
             raise ValueError(
-                f"Invalid format for monthly report: {raw_year_month}. Please use YEAR/MONTH Format"
+                f"Invalid format for monthly report: {raw_year_and_month}. Please use YEAR/MONTH Format"
             )
