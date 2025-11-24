@@ -20,9 +20,9 @@ PURPLE = "\033[95m"
 RESET = "\033[0m"
 
 MONTHLY_ATTRIBUTE_MAP = {
-    "max_temp": "highest_average_temp",
-    "min_temp": "lowest_average_temp",
-    "mean_humidity": "average_mean_humidity"
+    "highest_average_temp": "max_temp",
+    "lowest_average_temp": "min_temp",
+    "average_mean_humidity": "mean_humidity"
 }
 
 LOG_CONFIG = {

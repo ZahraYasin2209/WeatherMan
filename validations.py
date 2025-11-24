@@ -40,23 +40,49 @@ class WeatherReadingValidator:
             weather_attributes
         )
 
-    def validate_and_calculate_average_for_attribute(self, weather_readings, weather_attribute):
+    def extract_and_validate_attribute(self, weather_readings, weather_attribute):
         """
-        Validate the attribute value Calculate the average for a single weather attribute.
+        Extract the values of a specific weather attribute from a list of readings and validate them
+        by removing None or invalid entries.
 
         Args:
-            weather_readings (list[WeatherReading]): List of weather readings.
-            weather_attribute (str): The attribute to calculate the average for (e.g., 'temperature').
+            weather_readings (list[WeatherReading]): List of WeatherReading objects
+                from which the attribute values will be extracted.
+            weather_attribute (str): The name of the weather attribute to extract
+                (e.g., "max_temp", "min_temp", "mean_humidity").
 
         Returns:
-            float: The average of the valid readings for the given attribute.
+            list[float | int]: A list of valid values for the specified attribute,
+            with None or invalid entries removed.
         """
-        from calculations import WeatherCalculator
-
-        weather_attribute_values = self.readings.get_attribute_values(
+        extracted_attribute_values = self.readings.get_attribute_values(
             weather_readings, weather_attribute
         )
 
-        valid_attribute_values = self.validate_weather_readings(weather_attribute_values)
+        return self.validate_weather_readings(extracted_attribute_values)
 
-        return WeatherCalculator.calculate_average(valid_attribute_values)
+    def validate_monthly_weather_readings(self, monthly_weather_readings, weather_attributes):
+        """
+        Validate weather attribute values for a monthly dataset.
+
+        Args:
+            monthly_weather_readings (list[WeatherReading]): List of WeatherReading objects
+            weather_attributes (dict[str, str]): Dictionary mapping attribute keys (e.g., "max_temp", "min_temp",
+            "mean_humidity") to their corresponding attribute names in WeatherReading objects.
+
+        Returns:
+            dict[str, list[float | int]]: Dictionary mapping each attribute key to a list
+            of validated numeric values extracted from the monthly readings.
+        """
+        validated_attribute_values_per_key  = {}
+
+        for weather_attribute_key, weather_attribute_name in weather_attributes.items():
+            extracted_attribute_values = self.readings.get_attribute_values(
+                monthly_weather_readings, weather_attribute_name
+            )
+
+            validated_attribute_values_per_key[weather_attribute_key] = self.validate_weather_readings(
+                extracted_attribute_values
+            )
+
+        return validated_attribute_values_per_key

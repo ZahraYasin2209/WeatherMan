@@ -3,7 +3,8 @@ import argparse
 from calculations import WeatherCalculator
 from constants import (
     DEFAULT_WEATHER_DIR_PATH,
-    WEATHER_ATTRIBUTES
+    MONTHLY_ATTRIBUTE_MAP,
+    WEATHER_ATTRIBUTES,
 )
 from parser import (
     InputDateParser,
@@ -20,12 +21,12 @@ from weather_report_console_view import WeatherReportConsoleView
 class WeatherMan:
     def __init__(self):
         self.date_parser = InputDateParser()
-        self.weather_calculator = WeatherCalculator()
-        self.weather_data_parser = WeatherDataParser()
         self.reading_filter = WeatherReadingFilter()
         self.reading_formatters = WeatherReadingFormatter()
-        self.report = WeatherReportConsoleView()
         self.reading_validator = WeatherReadingValidator()
+        self.report = WeatherReportConsoleView()
+        self.weather_calculator = WeatherCalculator()
+        self.weather_data_parser = WeatherDataParser()
 
     def run(self):
         """
@@ -102,8 +103,12 @@ class WeatherMan:
                         WEATHER_ATTRIBUTES
                     )
 
-                    yearly_report = self.weather_calculator.calculate_yearly_weather_statistics(
+                    max_values_per_attribute = self.weather_calculator.find_max_reading_per_attribute(
                         valid_weather_readings
+                    )
+
+                    yearly_report = self.reading_filter.get_yearly_max_weather_values(
+                        max_values_per_attribute
                     )
 
                     formatted_weather_report = self.reading_formatters.format_yearly_weather_report(
@@ -111,7 +116,7 @@ class WeatherMan:
                     )
 
                     self.report.display_weather_report(
-                        "yearly",
+                        self.report.display_yearly_report,
                         formatted_weather_report,
                         year=year
                     )
@@ -124,17 +129,24 @@ class WeatherMan:
                     year, month = self.date_parser.parse_and_validate_year_and_month(raw_month)
 
                     monthly_weather_readings = self.reading_filter.get_sorted_readings_by_year_and_month(
-                        weather_readings, year, month
+                        weather_readings,
+                        year,
+                        month
                     )
 
                     if monthly_weather_readings:
-                        monthly_report = self.weather_calculator.calculate_monthly_averages(
-                            monthly_weather_readings
+                        validated_values = self.reading_validator.validate_monthly_weather_readings(
+                            monthly_weather_readings,
+                            MONTHLY_ATTRIBUTE_MAP
+                        )
+
+                        monthly_averages = self.weather_calculator.calculate_monthly_averages(
+                            validated_values
                         )
 
                         self.report.display_weather_report(
-                            "monthly",
-                            monthly_report,
+                            self.report.display_monthly_report,
+                            monthly_averages,
                             year=year,
                             month=month
                         )
@@ -147,16 +159,22 @@ class WeatherMan:
                     year, month = self.date_parser.parse_and_validate_year_and_month(monthly_weather_chart)
 
                     monthly_weather_readings = self.reading_filter.get_sorted_readings_by_year_and_month(
-                        weather_readings, year, month
+                        weather_readings,
+                        year,
+                        month
                     )
 
-                    self.report.display_weather_report(
-                        "chart",
-                        monthly_weather_readings,
-                        year=year,
-                        month=month,
-                        horizontal=horizontal
-                    )
+                    if monthly_weather_readings:
+                        formatted_temp_bars = self.reading_formatters.format_temp_chart(
+                            monthly_weather_readings, horizontal
+                        )
+
+                        self.report.display_weather_report(
+                            self.report.display_temp_chart,
+                            formatted_temp_bars,
+                            year=year,
+                            month=month
+                        )
                 except ValueError as date_input_error:
                     print(date_input_error)
 

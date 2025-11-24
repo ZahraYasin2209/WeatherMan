@@ -33,9 +33,9 @@ class WeatherReportConsoleView:
         and highest mean humidity.
 
         Args:
-            yearly_statistics (dict): Dictionary containing WeatherReading objects having keys:
-                "highest_temperature",
-                "lowest_temperature",
+            yearly_weather_report (list[dict]): A list of dictionaries, each containing WeatherReading data with keys:
+                "highest_temperature"
+                "lowest_temperature"
                 "highest_mean_humidity_day"
             Values may be None if data is missing.
 
@@ -66,60 +66,34 @@ class WeatherReportConsoleView:
         )
         print(monthly_weather_report)
 
-    def display_temp_chart(self, monthly_weather_readings, horizontal=False):
+    def display_temp_chart(self, formatted_temp_bars):
         """
-        Print the temperature chart for a given month.
+        Display a formatted temperature chart for a month.
 
         Args:
-            monthly_weather_readings (list[WeatherReading]): List of readings.
-            horizontal (bool): If True, display horizontal bars.
-        """
-        weather_temp_bars = self.readings_formatter.format_temp_chart(monthly_weather_readings, horizontal)
-
-        for temp_bar in weather_temp_bars:
-            print(temp_bar)
-
-    def get_weather_data_display_method(self, weather_data_category, horizontal=False):
-        """
-        Returns the appropriate function to display weather data based on the category.
-
-        Args:
-            weather_data_category (str): Type of weather data. Expected values:
-                - "yearly": for yearly weather reports
-                - "monthly": for monthly weather reports
-                - "chart": for temperature charts (horizontal or vertical)
-            horizontal (bool, optional): If True and the category is "chart", the
-                returned function will display the chart horizontally. Defaults to False.
+            formatted_temp_bars (list[str]): A list of strings, each representing a line in the
+            temperature chart, either vertical or horizontal.
 
         Returns:
-            Callable[[dict | list], None]: A callable that takes the weather data
-            as input and displays it. Returns None if the category is invalid.
+            None
         """
-        weather_report_display_methods = {
-            "yearly": self.display_yearly_report,
-            "monthly": self.display_monthly_report,
-            "chart": lambda weather_data: self.display_temp_chart(weather_data, horizontal)
-        }
-
-        return weather_report_display_methods.get(weather_data_category)
+        for temp_bar in formatted_temp_bars:
+            print(temp_bar)
 
     def display_weather_report(
-            self, weather_data_category, weather_report_data, year=None, month=None, horizontal=False
+            self, weather_report_display_method, weather_report_data, year=None, month=None
     ):
         """
         Function to display the data (yearly, monthly, or charts).
         It checks if the data exists and displays it or calls display_no_data function.
 
         Args:
-            weather_data_category (str): Type of data - "yearly", "monthly", or "chart".
-            weather_report_data (dict | list): The data to display.
+            weather_report_display_method (Callable): A function that takes `weather_report_data`
+                and displays it (e.g., display_yearly_report, display_monthly_report, or display_temp_chart).
+            weather_report_data (dict | list): The weather data to display.
             year (int, optional): Year for the report or chart. Defaults to None.
             month (int, optional): Month for the report or chart. Defaults to None.
-            horizontal (bool, optional): If True, display horizontal chart. Defaults to False.
         """
-        weather_report_display_method = self.get_weather_data_display_method(
-            weather_data_category, horizontal
-        )
 
         if weather_report_data and weather_report_display_method:
             weather_report_display_method(weather_report_data)

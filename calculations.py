@@ -1,17 +1,10 @@
 from constants import (
     AVERAGE_DEFAULT_VALUE,
-    MONTHLY_ATTRIBUTE_MAP,
     ROUNDED_AVERAGE_PRECISION,
 )
-from validations import WeatherReadingValidator
-from weather_reading_helpers import WeatherReadingFilter
 
 
 class WeatherCalculator:
-    def __init__(self):
-        self.weather_readings = WeatherReadingFilter()
-        self.readings_validator = WeatherReadingValidator()
-
     @staticmethod
     def calculate_average(weather_readings):
         """
@@ -31,21 +24,23 @@ class WeatherCalculator:
 
         return average_weather_readings
 
-    def calculate_monthly_averages(self, monthly_weather_readings):
+    def calculate_monthly_averages(self, validated_attribute_values):
         """
-        Calculate averages for all attributes of a monthly weather dataset.
+        Calculate the average value for each weather attribute in a monthly dataset.
 
         Args:
-            monthly_weather_readings (list[WeatherReading]): List of weather readings for the month.
+            validated_attribute_values (dict[str, list[float | int]]):
+                A dictionary mapping attribute keys (e.g., "highest_average_temp",
+                "lowest_average_temp", "average_mean_humidity") to lists of validated
+                numeric values for that attribute.
 
         Returns:
-            dict: A dictionary mapping each average key to its calculated average.
-        """
+            dict[str, float]: A dictionary mapping each attribute key to its calculated
+            average value, rounded according to WeatherCalculator's logic.
+            """
         return {
-            monthly_average_key: self.readings_validator.validate_and_calculate_average_for_attribute(
-                monthly_weather_readings, weather_attribute
-            )
-            for weather_attribute, monthly_average_key in MONTHLY_ATTRIBUTE_MAP.items()
+            monthly_average_key: self.calculate_average(validated_values)
+            for monthly_average_key, validated_values in validated_attribute_values.items()
         }
 
     @staticmethod
@@ -55,8 +50,8 @@ class WeatherCalculator:
 
         Args:
             attribute_readings (dict[str, list[WeatherReading]]):
-            Dictionary mapping weather attributes (e.g., "temperature", "humidity")
-            to lists of WeatherReading objects.
+                Dictionary mapping weather attributes (e.g., "temperature", "humidity")
+                to lists of WeatherReading objects.
 
         Returns:
             dict[str, WeatherReading | None]: Dictionary mapping each attribute to the WeatherReading
@@ -74,17 +69,3 @@ class WeatherCalculator:
                 max_reading_per_attribute[weather_attribute] = max_reading
 
         return max_reading_per_attribute
-
-    def calculate_yearly_weather_statistics(self, valid_weather_readings):
-        """
-        Calculate yearly weather statistics for the given year.
-
-        Args:
-            valid_weather_readings (list[WeatherReading]): List of validated weather readings.
-
-        Returns:
-            dict: Dictionary of yearly statistics having valid readings.
-        """
-        max_values_per_attribute = self.find_max_reading_per_attribute(valid_weather_readings)
-
-        return self.weather_readings.get_yearly_max_weather_values(max_values_per_attribute)
